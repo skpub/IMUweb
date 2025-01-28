@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
   import { onMount } from 'svelte';
