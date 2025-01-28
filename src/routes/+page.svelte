@@ -1,2 +1,11 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+  import imu_mc from '$lib/assets/IMU_minecraft.webp'
+</script>
+
+<img id="imu" src={imu_mc} alt="">
+
+<style>
+  #imu {
+    width: 100%;
+  }
+</style>
