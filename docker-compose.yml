@@ -8,7 +8,7 @@ services:
     environment:
       - "MINIO_ROOT_USER=${MINIO_ROOT_USER}"
       - "MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}"
-      - "MINIO_SERVER_URL=${MINIO_SERVER_URL:-http://localhost:9000}"
+      - "MINIO_SERVER_URL=http://${MINIO_SERVER_URL:-localhost:9000}"
     command: ['server', '/storage', '--console-address', ':9001']
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
