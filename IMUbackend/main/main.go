@@ -19,6 +19,8 @@ import (
 	"os/signal"
 
 	"github.com/joho/godotenv"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func main() {
@@ -30,7 +32,7 @@ func main() {
 		panic(fmt.Errorf("error loading .env file"))
 	}
 	var (
-		port = os.Getenv("BACKEND_PORT")
+		port    = os.Getenv("BACKEND_PORT")
 		address = os.Getenv("BACKEND_ADDR")
 	)
 	u, err := url.Parse(address + ":" + port)
@@ -55,12 +57,16 @@ func main() {
 	//
 	// DI START
 	//
+	endpoint := os.Getenv("MINIO_SERVER_URL")
+	accessKeyID := os.Getenv("MINIO_ROOT_USER")
+	secret := os.Getenv("MINIO_ROOT_PASSWORD")
 	bucket := os.Getenv("MDBUCKET")
 
-	client, err := infrastructure.NewS3Client()
-	if err != nil {
-		log.Fatal(ctx, err)
-	}
+	client_raw, err := minio.New(endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(accessKeyID, secret, ""),
+	})
+
+	client := infrastructure.NewS3Client(client_raw)
 
 	repo := repository.NewMarkdownRepository(client, bucket)
 
@@ -105,7 +111,7 @@ func main() {
 	// //
 	// //
 
-	// endpoints := gen.NewEndpoints(svc)	
+	// endpoints := gen.NewEndpoints(svc)
 	// mux := goahttp.NewMuxer()
 
 	// server.New(endpoints, mux, decoder, encoder, errorHandler, errorStatus)
