@@ -1,0 +1,3 @@
+[submodule "IMUarticle"]
+	path = IMUarticle
+	url = https://github.com/skpub/IMUarticle

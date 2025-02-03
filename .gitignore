@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 # Goa
 /IMUbackend/cmd
 /IMUbackend/gen
+
+/IMUarticle
