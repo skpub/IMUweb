@@ -10,21 +10,21 @@ import (
 	"database/sql"
 )
 
-const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, name, email, password, since) VALUES ($1, $2, $3, $4, NOW()) RETURNING id
+const createStudent = `-- name: CreateStudent :one
+INSERT INTO student (id, name, email, password, since) VALUES ($1, $2, $3, $4, NOW()) RETURNING id
 `
 
-type CreateUserParams struct {
+type CreateStudentParams struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-// USERS CRUD
-// USERS C
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (string, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
+// student CRUD
+// student C
+func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, createStudent,
 		arg.ID,
 		arg.Name,
 		arg.Email,
@@ -35,23 +35,23 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (string,
 	return id, err
 }
 
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users WHERE id = $1
+const deleteStudent = `-- name: DeleteStudent :exec
+DELETE FROM student WHERE id = $1
 `
 
-// USERS D
-func (q *Queries) DeleteUser(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, deleteUser, id)
+// student D
+func (q *Queries) DeleteStudent(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteStudent, id)
 	return err
 }
 
-const findUserByEmail = `-- name: FindUserByEmail :one
-SELECT id, name, bio, since, email, password FROM users WHERE email = $1
+const findStudentByEmail = `-- name: FindStudentByEmail :one
+SELECT id, name, bio, since, email, password FROM student WHERE email = $1
 `
 
-func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, findUserByEmail, email)
-	var i User
+func (q *Queries) FindStudentByEmail(ctx context.Context, email string) (Student, error) {
+	row := q.db.QueryRowContext(ctx, findStudentByEmail, email)
+	var i Student
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -63,14 +63,14 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 	return i, err
 }
 
-const findUserByID = `-- name: FindUserByID :one
-SELECT id, name, bio, since, email, password FROM users WHERE id = $1
+const findStudentByID = `-- name: FindStudentByID :one
+SELECT id, name, bio, since, email, password FROM student WHERE id = $1
 `
 
-// USERS R
-func (q *Queries) FindUserByID(ctx context.Context, id string) (User, error) {
-	row := q.db.QueryRowContext(ctx, findUserByID, id)
-	var i User
+// student R
+func (q *Queries) FindStudentByID(ctx context.Context, id string) (Student, error) {
+	row := q.db.QueryRowContext(ctx, findStudentByID, id)
+	var i Student
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -83,7 +83,7 @@ func (q *Queries) FindUserByID(ctx context.Context, id string) (User, error) {
 }
 
 const login = `-- name: Login :exec
-SELECT count(*) FROM users WHERE id = $1 AND password = $2
+SELECT count(*) FROM student WHERE id = $1 AND password = $2
 `
 
 type LoginParams struct {
@@ -96,31 +96,31 @@ func (q *Queries) Login(ctx context.Context, arg LoginParams) error {
 	return err
 }
 
-const updateUserBio = `-- name: UpdateUserBio :exec
-UPDATE users SET bio = $2 WHERE id = $1
+const updateStudentBio = `-- name: UpdateStudentBio :exec
+UPDATE student SET bio = $2 WHERE id = $1
 `
 
-type UpdateUserBioParams struct {
+type UpdateStudentBioParams struct {
 	ID  string         `json:"id"`
 	Bio sql.NullString `json:"bio"`
 }
 
-func (q *Queries) UpdateUserBio(ctx context.Context, arg UpdateUserBioParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserBio, arg.ID, arg.Bio)
+func (q *Queries) UpdateStudentBio(ctx context.Context, arg UpdateStudentBioParams) error {
+	_, err := q.db.ExecContext(ctx, updateStudentBio, arg.ID, arg.Bio)
 	return err
 }
 
-const updateUserName = `-- name: UpdateUserName :exec
-UPDATE users SET name = $2 WHERE id = $1
+const updateStudentName = `-- name: UpdateStudentName :exec
+UPDATE student SET name = $2 WHERE id = $1
 `
 
-type UpdateUserNameParams struct {
+type UpdateStudentNameParams struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-// USERS U
-func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserName, arg.ID, arg.Name)
+// student U
+func (q *Queries) UpdateStudentName(ctx context.Context, arg UpdateStudentNameParams) error {
+	_, err := q.db.ExecContext(ctx, updateStudentName, arg.ID, arg.Name)
 	return err
 }

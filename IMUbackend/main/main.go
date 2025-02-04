@@ -88,7 +88,7 @@ func main() {
 		panic(err)
 	}
 	txManager := infrastructure.NewDBManager(db)
-	userRepo := repository.NewUserRepository(dbb.New(db))
+	userRepo := repository.NewStudentRepository(dbb.New(db))
 	// end postgres
 
 

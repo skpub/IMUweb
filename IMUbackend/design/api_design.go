@@ -20,14 +20,14 @@ var Markdown = Type("Markdown", func() {
 })
 
 var LoginAttribute = Type("Login", func() {
-	Attribute("username", String)
+	Attribute("studentName", String)
 	Attribute("password", String)
 })
 
 var SignupAttribute = Type("Signup", func() {
-	Attribute("user_id", String)
+	Attribute("student_id", String)
 	Attribute("password", String)
-	Attribute("user_name", String)
+	Attribute("studentName", String)
 	Attribute("email", String)
 })
 
@@ -49,11 +49,11 @@ var _ = Service("imubackend", func() {
 	})
 
 	// User CRUD
-	Method("createUser", func() {
-		Description("create user.")
+	Method("createStudent", func() {
+		Description("create student.")
 		Payload(SignupAttribute)
 		HTTP(func() {
-			POST("/user/create")
+			POST("/student/create")
 			Response(StatusOK)
 		})
 	})

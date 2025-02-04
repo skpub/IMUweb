@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE student (
     id          varchar(126) PRIMARY KEY NOT NULL,
     name        varchar(126) NOT NULL,
     bio         varchar(510),

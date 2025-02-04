@@ -8,14 +8,14 @@ import (
 
 // returns (token, err)
 func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error) {
-	err := s.user.Login(ctx, nil, *attribute.Username, *attribute.Password)
+	err := s.user.Login(ctx, nil, *attribute.StudentName, *attribute.Password)
 	if err != nil {
 		return "", err
 	}
 	return "", nil	
 }
 
-func (s *IMUSrv) CreateUser(ctx context.Context, attribute *pb.Signup) error {
+func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error {
 	tx, err := s.txManager.BeginTx(ctx)
 	if err != nil {
 		return err
@@ -26,9 +26,9 @@ func (s *IMUSrv) CreateUser(ctx context.Context, attribute *pb.Signup) error {
 			tx.Rollback()
 		}
 	}()
-	err = s.user.Create(ctx, tx, db.User{
-		ID: 		*attribute.UserID,
-		Name: 		*attribute.UserName,
+	err = s.user.Create(ctx, tx, db.Student{
+		ID: 		*attribute.StudentID,
+		Name: 		*attribute.StudentName,
 		Password: 	*attribute.Password,
 		Email: 		*attribute.Email,
 	})

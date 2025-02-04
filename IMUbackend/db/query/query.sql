@@ -1,22 +1,26 @@
--- USERS CRUD
--- USERS C
--- name: CreateUser :one
-INSERT INTO users (id, name, email, password, since) VALUES ($1, $2, $3, $4, NOW()) RETURNING id;
+-- student CRUD
+-- student C
+-- name: CreateStudent :one
+INSERT INTO student (id, name, email, password, since) VALUES ($1, $2, $3, $4, NOW()) RETURNING id;
 
--- USERS R
--- name: FindUserByID :one
-SELECT * FROM users WHERE id = $1;
--- name: FindUserByEmail :one
-SELECT * FROM users WHERE email = $1;
+-- student R
+-- name: FindStudentByID :one
+SELECT * FROM student WHERE id = $1;
+-- name: FindStudentByEmail :one
+SELECT * FROM student WHERE email = $1;
 -- name: Login :exec
-SELECT count(*) FROM users WHERE id = $1 AND password = $2;
+SELECT count(*) FROM student WHERE id = $1 AND password = $2;
 
--- USERS U
--- name: UpdateUserName :exec
-UPDATE users SET name = $2 WHERE id = $1;
--- name: UpdateUserBio :exec
-UPDATE users SET bio = $2 WHERE id = $1;
+-- student U
+-- name: UpdateStudentName :exec
+UPDATE student SET name = $2 WHERE id = $1;
+-- name: UpdateStudentBio :exec
+UPDATE student SET bio = $2 WHERE id = $1;
 
--- USERS D
--- name: DeleteUser :exec
-DELETE FROM users WHERE id = $1;
+-- student D
+-- name: DeleteStudent :exec
+DELETE FROM student WHERE id = $1;
+
+
+-- markdown CRUD
+-- markdown C

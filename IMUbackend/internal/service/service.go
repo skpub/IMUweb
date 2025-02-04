@@ -8,10 +8,10 @@ import (
 type IMUSrv struct {
 	txManager	repo.TxManager
 	md 			repo.IMarkdownRepository
-	user 		repo.IUserRepository
+	user 		repo.IStudentRepository
 }
 
-func NewIMUSrv(md repo.IMarkdownRepository, user repo.IUserRepository, txManager repo.TxManager) pb.Service {
+func NewIMUSrv(md repo.IMarkdownRepository, user repo.IStudentRepository, txManager repo.TxManager) pb.Service {
 	return &IMUSrv{
 		txManager,
 		md,
