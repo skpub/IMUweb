@@ -9,6 +9,26 @@ import (
 	"time"
 )
 
+type Img struct {
+	ID      int64  `json:"id"`
+	Name    string `json:"name"`
+	ImgPath string `json:"img_path"`
+}
+
+type Markdown struct {
+	ID          int64     `json:"id"`
+	StudentID   string    `json:"student_id"`
+	Title       string    `json:"title"`
+	ContentPath string    `json:"content_path"`
+	Since       time.Time `json:"since"`
+	Updated     time.Time `json:"updated"`
+}
+
+type MarkdownImgRel struct {
+	MarkdownID int64 `json:"markdown_id"`
+	ImgID      int64 `json:"img_id"`
+}
+
 type Student struct {
 	ID       string         `json:"id"`
 	Name     string         `json:"name"`
