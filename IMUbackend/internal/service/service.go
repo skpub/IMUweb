@@ -2,27 +2,21 @@ package service
 
 import (
 	pb "IMUbackend/gen/imubackend"
-	entity "IMUbackend/internal/domain"
 	repo "IMUbackend/internal/repository"
-	"context"
-	"time"
 )
 
-type MarkdownSrv struct {
-	repo repo.IMarkdownRepository
+type IMUSrv struct {
+	txManager	repo.TxManager
+	md 			repo.IMarkdownRepository
+	user 		repo.IUserRepository
 }
 
-func NewMarkdownService(repo repo.IMarkdownRepository) pb.Service {
-	return &MarkdownSrv{repo}
-}
-
-func (s *MarkdownSrv) Create(ctx context.Context, p *pb.Markdown) error {
-	md := entity.Markdown{
-		ArticleName: p.ArticleName,
-		Content:     p.Content,
-		CreatedAt:   time.Now(),
+func NewIMUSrv(md repo.IMarkdownRepository, user repo.IUserRepository, txManager repo.TxManager) pb.Service {
+	return &IMUSrv{
+		txManager,
+		md,
+		user,
 	}
-
-	err := s.repo.Create(ctx, md)
-	return err
 }
+
+

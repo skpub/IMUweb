@@ -3,6 +3,8 @@ package infrastructure
 import (
 	"context"
 	"io"
+	entity "IMUbackend/internal/domain"
+	repo "IMUbackend/internal/repository"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -13,25 +15,33 @@ type IS3Client interface {
 	Delete(ctx context.Context, key string, backet string) error
 }
 
-type S3Client struct {
+type MarkdownRepository struct {
 	client *minio.Client
+	bucket string
 }
 
-func NewS3Client(client *minio.Client) IS3Client {
-	return S3Client{client: client}
+func NewMarkdownRepository(client *minio.Client, bucket string) repo.IMarkdownRepository {
+	return &MarkdownRepository{client, bucket}
 }
 
-func (client S3Client) Find(ctx context.Context, key string, bucket string) (io.Reader, error) {
-	content, err := client.client.GetObject(ctx, bucket, key, minio.GetObjectOptions{})
-	return content, err
+func (m *MarkdownRepository) Create(ctx context.Context, markdown entity.Markdown) error {
+	// obj, _ := m.client.GetObject(ctx, m.bucket, markdown.ArticleName, minio.GetObjectOptions{})
+	// if obj != nil {
+		// return fmt.Errorf("already exists")
+	// }
+	// err := m.client.PutObject(ctx, m.bucket, markdown.ArticleName, markdown, m.bucket)
+	// return err
+	return nil
 }
 
-func (client S3Client) Create(ctx context.Context, key string, content io.Reader, bucket string) error {
-	_, err := client.client.PutObject(ctx, bucket, key, content, -1, minio.PutObjectOptions{})
-	return err
+func (m *MarkdownRepository) Update(ctx context.Context, markdown entity.Markdown) error {
+	return nil
 }
 
-func (client S3Client) Delete(ctx context.Context, key string, bucket string) error {
-	err := client.client.RemoveObject(ctx, bucket, key, minio.RemoveObjectOptions{})
-	return err
+func (m *MarkdownRepository) FindByID(ctx context.Context, articleName string) (entity.Markdown, error) {
+	return entity.Markdown{}, nil
+}
+
+func (m *MarkdownRepository) Delete(ctx context.Context, articleName string) error {
+	return nil
 }

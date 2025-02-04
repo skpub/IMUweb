@@ -19,6 +19,19 @@ var Markdown = Type("Markdown", func() {
 	Required("articleName", "content")
 })
 
+var LoginAttribute = Type("Login", func() {
+	Attribute("username", String)
+	Attribute("password", String)
+})
+
+var SignupAttribute = Type("Signup", func() {
+	Attribute("user_id", String)
+	Attribute("password", String)
+	Attribute("user_name", String)
+	Attribute("email", String)
+})
+
+
 var _ = Service("imubackend", func() {
 	Description("markdown file server.")
 
@@ -31,6 +44,25 @@ var _ = Service("imubackend", func() {
 		Payload(Markdown)
 		HTTP(func() {
 			POST("/article/create")
+			Response(StatusOK)
+		})
+	})
+
+	// User CRUD
+	Method("createUser", func() {
+		Description("create user.")
+		Payload(SignupAttribute)
+		HTTP(func() {
+			POST("/user/create")
+			Response(StatusOK)
+		})
+	})
+	Method("login", func() {
+		Description("IMU teacher and student login.")
+		Payload(LoginAttribute)
+		Result(String)
+		HTTP(func() {
+			POST("/login")
 			Response(StatusOK)
 		})
 	})
