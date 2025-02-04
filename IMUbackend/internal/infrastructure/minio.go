@@ -1,6 +1,22 @@
 package infrastructure
 
 import (
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+)
+
+func NewObjectStorageConnection(endpoint string, accessKeyID string, secret string) (*minio.Client, error) {
+	client, err := minio.New(endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(accessKeyID, secret, ""),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+/*
+import (
 	"context"
 	"io"
 	entity "IMUbackend/internal/domain"
@@ -45,3 +61,4 @@ func (m *MarkdownRepository) FindByID(ctx context.Context, articleName string) (
 func (m *MarkdownRepository) Delete(ctx context.Context, articleName string) error {
 	return nil
 }
+*/

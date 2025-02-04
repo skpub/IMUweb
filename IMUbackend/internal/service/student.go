@@ -1,9 +1,9 @@
 package service
 
 import (
+	"IMUbackend/db"
 	pb "IMUbackend/gen/imubackend"
 	"context"
-	"IMUbackend/db"
 )
 
 // returns (token, err)
@@ -12,11 +12,11 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	if err != nil {
 		return "", err
 	}
-	return "", nil	
+	return "", nil
 }
 
 func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error {
-	tx, err := s.txManager.BeginTx(ctx)
+	tx, err := s.tx.BeginTx(ctx)
 	if err != nil {
 		return err
 	}
@@ -27,10 +27,10 @@ func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error 
 		}
 	}()
 	err = s.user.Create(ctx, tx, db.Student{
-		ID: 		*attribute.StudentID,
-		Name: 		*attribute.StudentName,
-		Password: 	*attribute.Password,
-		Email: 		*attribute.Email,
+		ID:       *attribute.StudentID,
+		Name:     *attribute.StudentName,
+		Password: *attribute.Password,
+		Email:    *attribute.Email,
 	})
 	if err != nil {
 		return err

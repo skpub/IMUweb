@@ -23,22 +23,22 @@ func NewStudentRepository(query *db.Queries) IStudentRepository {
 	return &StudentRepository{query}
 }
 
-func (u *StudentRepository) Login(ctx context.Context,tx Tx, id string, password string) error {
+func (u *StudentRepository) Login(ctx context.Context, tx Tx, id string, password string) error {
 	return tx.Queries().Login(ctx, db.LoginParams{
-		ID: id,
+		ID:       id,
 		Password: password,
 	})
 }
 
-func (u *StudentRepository) Create(ctx context.Context, tx Tx ,user db.Student) error {
+func (u *StudentRepository) Create(ctx context.Context, tx Tx, user db.Student) error {
 	_, err := tx.Queries().FindStudentByID(ctx, user.ID)
 	if err != nil {
 		// err is not nil, but this means that the user does not exist
 		// so we can create the user
 		tx.Queries().CreateStudent(ctx, db.CreateStudentParams{
-			ID: user.ID,
-			Name: user.Name,
-			Email: user.Email,
+			ID:       user.ID,
+			Name:     user.Name,
+			Email:    user.Email,
 			Password: user.Password,
 		})
 		return nil
@@ -54,8 +54,8 @@ func (u *StudentRepository) UpdateBio(ctx context.Context, tx Tx, id string, bio
 		return err
 	}
 	return tx.Queries().UpdateStudentBio(ctx, db.UpdateStudentBioParams{
-		ID: id,
-		Bio: sql.NullString{ String: bio, Valid: true },
+		ID:  id,
+		Bio: sql.NullString{String: bio, Valid: true},
 	})
 }
 

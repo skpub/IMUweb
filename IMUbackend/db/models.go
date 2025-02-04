@@ -7,16 +7,17 @@ package db
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Img struct {
-	ID      int64  `json:"id"`
-	Name    string `json:"name"`
-	ImgPath string `json:"img_path"`
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
 type Markdown struct {
-	ID          int64     `json:"id"`
+	ID          uuid.UUID `json:"id"`
 	StudentID   string    `json:"student_id"`
 	Title       string    `json:"title"`
 	ContentPath string    `json:"content_path"`
@@ -25,8 +26,8 @@ type Markdown struct {
 }
 
 type MarkdownImgRel struct {
-	MarkdownID int64 `json:"markdown_id"`
-	ImgID      int64 `json:"img_id"`
+	MarkdownID uuid.UUID `json:"markdown_id"`
+	ImgID      uuid.UUID `json:"img_id"`
 }
 
 type Student struct {

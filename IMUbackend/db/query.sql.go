@@ -8,43 +8,39 @@ package db
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 const createImg = `-- name: CreateImg :one
-INSERT INTO img (name, img_path) VALUES ($1, $2) RETURNING id
+INSERT INTO img (name) VALUES ($1) RETURNING id
 `
-
-type CreateImgParams struct {
-	Name    string `json:"name"`
-	ImgPath string `json:"img_path"`
-}
 
 // img CRUD
 // img C
-func (q *Queries) CreateImg(ctx context.Context, arg CreateImgParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createImg, arg.Name, arg.ImgPath)
-	var id int64
+func (q *Queries) CreateImg(ctx context.Context, name string) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createImg, name)
+	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
 }
 
 const createMarkdown = `-- name: CreateMarkdown :one
-INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETURNING id
+INSERT INTO markdown (student_id, title) VALUES ($1, $2) RETURNING id
 `
 
 type CreateMarkdownParams struct {
-	StudentID   string `json:"student_id"`
-	Title       string `json:"title"`
-	ContentPath string `json:"content_path"`
+	StudentID string `json:"student_id"`
+	Title     string `json:"title"`
 }
 
 // Defines queries for a data unit that must maintain transactional consistency.
 // RESOURCES: markdown, img, markdown_img_rel
 // markdown CRUD
 // markdown C
-func (q *Queries) CreateMarkdown(ctx context.Context, arg CreateMarkdownParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createMarkdown, arg.StudentID, arg.Title, arg.ContentPath)
-	var id int64
+func (q *Queries) CreateMarkdown(ctx context.Context, arg CreateMarkdownParams) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, createMarkdown, arg.StudentID, arg.Title)
+	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
 }
@@ -54,8 +50,8 @@ INSERT INTO markdown_img_rel (markdown_id, img_id) VALUES ($1, $2)
 `
 
 type CreateMarkdownImgRelParams struct {
-	MarkdownID int64 `json:"markdown_id"`
-	ImgID      int64 `json:"img_id"`
+	MarkdownID uuid.UUID `json:"markdown_id"`
+	ImgID      uuid.UUID `json:"img_id"`
 }
 
 // md_img_rel CRUD
@@ -95,7 +91,7 @@ DELETE FROM img WHERE id = $1
 `
 
 // img D
-func (q *Queries) DeleteImg(ctx context.Context, id int64) error {
+func (q *Queries) DeleteImg(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteImg, id)
 	return err
 }
@@ -105,7 +101,7 @@ DELETE FROM markdown WHERE id = $1
 `
 
 // markdown D
-func (q *Queries) DeleteMarkdown(ctx context.Context, id int64) error {
+func (q *Queries) DeleteMarkdown(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteMarkdown, id)
 	return err
 }
@@ -115,8 +111,8 @@ DELETE FROM markdown_img_rel WHERE markdown_id = $1 AND img_id = $2
 `
 
 type DeleteMarkdownImgRelParams struct {
-	MarkdownID int64 `json:"markdown_id"`
-	ImgID      int64 `json:"img_id"`
+	MarkdownID uuid.UUID `json:"markdown_id"`
+	ImgID      uuid.UUID `json:"img_id"`
 }
 
 // md_img_rel D
@@ -130,7 +126,7 @@ DELETE FROM markdown_img_rel WHERE markdown_id = $1
 `
 
 // md_img_rel D
-func (q *Queries) DeleteMarkdownImgRelByMarkdownID(ctx context.Context, markdownID int64) error {
+func (q *Queries) DeleteMarkdownImgRelByMarkdownID(ctx context.Context, markdownID uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteMarkdownImgRelByMarkdownID, markdownID)
 	return err
 }
@@ -146,22 +142,22 @@ func (q *Queries) DeleteStudent(ctx context.Context, id string) error {
 }
 
 const findImages = `-- name: FindImages :many
-SELECT i.img_path AS img_path
+SELECT i.id AS img_path
 FROM img i 
 JOIN markdown_img_rel mir ON i.id = mir.img_id
 WHERE mir.markdown_id = $1
 `
 
 // - md, img, md_img_rel R
-func (q *Queries) FindImages(ctx context.Context, markdownID int64) ([]string, error) {
+func (q *Queries) FindImages(ctx context.Context, markdownID uuid.UUID) ([]uuid.UUID, error) {
 	rows, err := q.db.QueryContext(ctx, findImages, markdownID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []string
+	var items []uuid.UUID
 	for rows.Next() {
-		var img_path string
+		var img_path uuid.UUID
 		if err := rows.Scan(&img_path); err != nil {
 			return nil, err
 		}
@@ -177,14 +173,14 @@ func (q *Queries) FindImages(ctx context.Context, markdownID int64) ([]string, e
 }
 
 const findImgByID = `-- name: FindImgByID :one
-SELECT id, name, img_path FROM img WHERE id = $1
+SELECT id, name FROM img WHERE id = $1
 `
 
 // img R
-func (q *Queries) FindImgByID(ctx context.Context, id int64) (Img, error) {
+func (q *Queries) FindImgByID(ctx context.Context, id uuid.UUID) (Img, error) {
 	row := q.db.QueryRowContext(ctx, findImgByID, id)
 	var i Img
-	err := row.Scan(&i.ID, &i.Name, &i.ImgPath)
+	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
 
@@ -193,7 +189,7 @@ SELECT id, student_id, title, content_path, since, updated FROM markdown WHERE i
 `
 
 // markdown R
-func (q *Queries) FindMarkdownByID(ctx context.Context, id int64) (Markdown, error) {
+func (q *Queries) FindMarkdownByID(ctx context.Context, id uuid.UUID) (Markdown, error) {
 	row := q.db.QueryRowContext(ctx, findMarkdownByID, id)
 	var i Markdown
 	err := row.Scan(
@@ -212,7 +208,7 @@ SELECT markdown_id, img_id FROM markdown_img_rel WHERE markdown_id = $1
 `
 
 // md_img_rel R
-func (q *Queries) FindMarkdownImgRelByMarkdownID(ctx context.Context, markdownID int64) ([]MarkdownImgRel, error) {
+func (q *Queries) FindMarkdownImgRelByMarkdownID(ctx context.Context, markdownID uuid.UUID) ([]MarkdownImgRel, error) {
 	rows, err := q.db.QueryContext(ctx, findMarkdownImgRelByMarkdownID, markdownID)
 	if err != nil {
 		return nil, err
@@ -287,18 +283,17 @@ func (q *Queries) Login(ctx context.Context, arg LoginParams) error {
 }
 
 const updateImg = `-- name: UpdateImg :exec
-UPDATE img SET name = $2 AND img_path = $3 WHERE id = $1
+UPDATE img SET name = $2 WHERE id = $1
 `
 
 type UpdateImgParams struct {
-	ID      int64  `json:"id"`
-	Name    string `json:"name"`
-	ImgPath string `json:"img_path"`
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
 // img U
 func (q *Queries) UpdateImg(ctx context.Context, arg UpdateImgParams) error {
-	_, err := q.db.ExecContext(ctx, updateImg, arg.ID, arg.Name, arg.ImgPath)
+	_, err := q.db.ExecContext(ctx, updateImg, arg.ID, arg.Name)
 	return err
 }
 
@@ -307,8 +302,8 @@ UPDATE markdown SET title = $2 AND updated = NOW() WHERE id = $1
 `
 
 type UpdateMarkdownParams struct {
-	ID    int64  `json:"id"`
-	Title string `json:"title"`
+	ID    uuid.UUID `json:"id"`
+	Title string    `json:"title"`
 }
 
 // markdown U

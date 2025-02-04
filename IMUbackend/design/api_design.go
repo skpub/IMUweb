@@ -13,9 +13,11 @@ var _ = API("imubackend", func() {
 	})
 })
 
-var Markdown = Type("Markdown", func() {
+var CreateMarkdownAttribute = Type("CreateMarkdownAttr", func() {
 	Attribute("articleName", String)
+	Attribute("studentId", String)
 	Attribute("content", String)
+	Attribute("image", ArrayOf(Bytes))
 	Required("articleName", "content")
 })
 
@@ -31,7 +33,6 @@ var SignupAttribute = Type("Signup", func() {
 	Attribute("email", String)
 })
 
-
 var _ = Service("imubackend", func() {
 	Description("markdown file server.")
 
@@ -39,10 +40,11 @@ var _ = Service("imubackend", func() {
 		Path("/api")
 	})
 
-	Method("create", func() {
+	Method("createMarkdown", func() {
 		Description("create markdown file.")
-		Payload(Markdown)
+		Payload(CreateMarkdownAttribute)
 		HTTP(func() {
+			MultipartRequest()
 			POST("/article/create")
 			Response(StatusOK)
 		})

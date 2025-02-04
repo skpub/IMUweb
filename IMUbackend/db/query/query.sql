@@ -27,7 +27,7 @@ DELETE FROM student WHERE id = $1;
 -- markdown CRUD
 -- markdown C
 -- name: CreateMarkdown :one
-INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETURNING id;
+INSERT INTO markdown (student_id, title) VALUES ($1, $2) RETURNING id;
 
 -- markdown R
 -- name: FindMarkdownByID :one
@@ -45,7 +45,7 @@ DELETE FROM markdown WHERE id = $1;
 -- img CRUD
 -- img C
 -- name: CreateImg :one
-INSERT INTO img (name, img_path) VALUES ($1, $2) RETURNING id;
+INSERT INTO img (name) VALUES ($1) RETURNING id;
 
 -- img R
 -- name: FindImgByID :one
@@ -53,7 +53,7 @@ SELECT * FROM img WHERE id = $1;
 
 -- img U
 -- name: UpdateImg :exec
-UPDATE img SET name = $2 AND img_path = $3 WHERE id = $1;
+UPDATE img SET name = $2 WHERE id = $1;
 
 -- img D
 -- name: DeleteImg :exec
@@ -80,7 +80,7 @@ DELETE FROM markdown_img_rel WHERE markdown_id = $1 AND img_id = $2;
 
 --- md, img, md_img_rel R
 -- name: FindImages :many
-SELECT i.img_path AS img_path
+SELECT i.id AS img_path
 FROM img i 
 JOIN markdown_img_rel mir ON i.id = mir.img_id
 WHERE mir.markdown_id = $1;

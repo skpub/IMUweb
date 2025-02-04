@@ -21,7 +21,6 @@ import (
 	"os"
 	"os/signal"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -66,14 +65,12 @@ func main() {
 	endpoint := os.Getenv("MINIO_SERVER_URL")
 	accessKeyID := os.Getenv("MINIO_ROOT_USER")
 	secret := os.Getenv("MINIO_ROOT_PASSWORD")
-	client, err := minio.New(endpoint, &minio.Options{
-		Creds: credentials.NewStaticV4(accessKeyID, secret, ""),
-	})
+	client, err := infrastructure.NewObjectStorageConnection(endpoint, accessKeyID, secret)
 	if err != nil {
 		panic(err)
 	}
-	bucket := os.Getenv("MDBUCKET")
-	repoMd := infrastructure.NewMarkdownRepository(client, bucket)
+	// bucket := os.Getenv("MDBUCKET")
+	repoMd := infrastructure.NewObjectStorageConnection(client)
 	// end minio
 
 	// postgres
@@ -83,15 +80,13 @@ func main() {
 	pg_dbname := os.Getenv("PG_DBNAME")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", pg_user, pg_password, pg_host, "5432", pg_dbname)
 
-	db, err := sql.Open("pgx", dsn)
+	db, err := infrastructure.NewDBConnection(dsn)
 	if err != nil {
 		panic(err)
 	}
-	txManager := infrastructure.NewDBManager(db)
+	txManager := repository.NewSQLTxManager(db)
 	userRepo := repository.NewStudentRepository(dbb.New(db))
 	// end postgres
-
-
 
 	svc := service.NewIMUSrv(repoMd, userRepo, txManager)
 	//

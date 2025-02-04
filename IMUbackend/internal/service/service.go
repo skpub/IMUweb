@@ -6,17 +6,15 @@ import (
 )
 
 type IMUSrv struct {
-	txManager	repo.TxManager
-	md 			repo.IMarkdownRepository
-	user 		repo.IStudentRepository
+	article   repo.IArticleRepository
+	user repo.IStudentRepository
+	tx   repo.TxManager
 }
 
-func NewIMUSrv(md repo.IMarkdownRepository, user repo.IStudentRepository, txManager repo.TxManager) pb.Service {
+func NewIMUSrv(article repo.IArticleRepository, user repo.IStudentRepository, txManager repo.TxManager) pb.Service {
 	return &IMUSrv{
-		txManager,
-		md,
+		article,
 		user,
+		txManager,
 	}
 }
-
-
