@@ -34,3 +34,31 @@ services:
 
     volumes:
       - ${POOL_PATH}
+  
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: my_postgres
+    container_name: imu_db
+    ports:
+      - 5432:5432
+    volumes:
+      - db-store:/var/lib/postgresql/data
+      - ./IMUbackend/dbinit:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DBNAME}
+    # You can add the following lines to enable the query logging
+    # 
+    # command: >
+    #   postgres  -c logging_collector=on
+    #             -c log_directory=/var/lib/postgresql/data/log
+    #             -c log_rotation_age=1d
+    #             -c log_rotation_size=1MB
+    #             -c log_statement=all
+volumes:
+  db-store:
+    
+  

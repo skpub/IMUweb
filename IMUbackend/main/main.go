@@ -3,6 +3,7 @@ package main
 import (
 	"IMUbackend/gen/imubackend"
 	"context"
+	"database/sql"
 	"flag"
 	"net/url"
 	"sync"
@@ -11,8 +12,10 @@ import (
 	"goa.design/clue/debug"
 	"goa.design/clue/log"
 
+	dbb "IMUbackend/db"
+
 	infrastructure "IMUbackend/internal/infrastructure"
-	repository "IMUbackend/internal/repository"
+	"IMUbackend/internal/repository"
 	service "IMUbackend/internal/service"
 	"fmt"
 	"os"
@@ -37,7 +40,7 @@ func main() {
 	)
 	u, err := url.Parse(address + ":" + port)
 	if err != nil {
-		panic(fmt.Errorf("specify BACKEND_ADDR correctly."))
+		panic(fmt.Errorf("specify BACKEND_ADDR correctly"))
 	}
 
 	format := log.FormatJSON
@@ -57,20 +60,35 @@ func main() {
 	//
 	// DI START
 	//
+
+	// minio
 	endpoint := os.Getenv("MINIO_SERVER_URL")
 	accessKeyID := os.Getenv("MINIO_ROOT_USER")
 	secret := os.Getenv("MINIO_ROOT_PASSWORD")
-	bucket := os.Getenv("MDBUCKET")
+	client, err := infrastructure.NewObjectStorageConnection(endpoint, accessKeyID, secret)
+	if err != nil {
+		panic(err)
+	}
+	// bucket := os.Getenv("MDBUCKET")
+	repoMd := infrastructure.NewObjectStorageConnection(client)
+	// end minio
 
-	client_raw, err := minio.New(endpoint, &minio.Options{
-		Creds: credentials.NewStaticV4(accessKeyID, secret, ""),
-	})
+	// postgres
+	pg_host := os.Getenv("PG_HOST")
+	pg_user := os.Getenv("PG_USER")
+	pg_password := os.Getenv("PG_PASSWORD")
+	pg_dbname := os.Getenv("PG_DBNAME")
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", pg_user, pg_password, pg_host, "5432", pg_dbname)
 
-	client := infrastructure.NewS3Client(client_raw)
+	db, err := infrastructure.NewDBConnection(dsn)
+	if err != nil {
+		panic(err)
+	}
+	txManager := repository.NewSQLTxManager(db)
+	userRepo := repository.NewStudentRepository(dbb.New(db))
+	// end postgres
 
-	repo := repository.NewMarkdownRepository(client, bucket)
-
-	svc := service.NewMarkdownService(repo)
+	svc := service.NewIMUSrv(repoMd, userRepo, txManager)
 	//
 	// DI END
 	//

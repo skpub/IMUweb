@@ -1,0 +1,22 @@
+version: "2"
+cloud:
+    organization: ""
+    project: ""
+    hostname: ""
+servers: []
+sql:
+  - engine: postgresql
+    schema: 
+      - "./db/query/schema.sql"
+    queries:
+      - "./db/query/query.sql"
+    gen:
+        go:
+            package: "db"
+            out: "./db"
+            emit_json_tags: true
+overrides:
+    go: null
+plugins: []
+rules: []
+options: {}

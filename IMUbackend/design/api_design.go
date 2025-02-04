@@ -13,10 +13,24 @@ var _ = API("imubackend", func() {
 	})
 })
 
-var Markdown = Type("Markdown", func() {
+var CreateMarkdownAttribute = Type("CreateMarkdownAttr", func() {
 	Attribute("articleName", String)
+	Attribute("studentId", String)
 	Attribute("content", String)
+	Attribute("image", ArrayOf(Bytes))
 	Required("articleName", "content")
+})
+
+var LoginAttribute = Type("Login", func() {
+	Attribute("studentName", String)
+	Attribute("password", String)
+})
+
+var SignupAttribute = Type("Signup", func() {
+	Attribute("student_id", String)
+	Attribute("password", String)
+	Attribute("studentName", String)
+	Attribute("email", String)
 })
 
 var _ = Service("imubackend", func() {
@@ -26,11 +40,31 @@ var _ = Service("imubackend", func() {
 		Path("/api")
 	})
 
-	Method("create", func() {
+	Method("createMarkdown", func() {
 		Description("create markdown file.")
-		Payload(Markdown)
+		Payload(CreateMarkdownAttribute)
 		HTTP(func() {
+			MultipartRequest()
 			POST("/article/create")
+			Response(StatusOK)
+		})
+	})
+
+	// User CRUD
+	Method("createStudent", func() {
+		Description("create student.")
+		Payload(SignupAttribute)
+		HTTP(func() {
+			POST("/student/create")
+			Response(StatusOK)
+		})
+	})
+	Method("login", func() {
+		Description("IMU teacher and student login.")
+		Payload(LoginAttribute)
+		Result(String)
+		HTTP(func() {
+			POST("/login")
 			Response(StatusOK)
 		})
 	})

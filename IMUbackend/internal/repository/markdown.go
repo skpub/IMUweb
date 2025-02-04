@@ -1,65 +1,64 @@
 package repository
 
 import (
-	entity "IMUbackend/internal/domain"
-	infra "IMUbackend/internal/infrastructure"
+	"IMUbackend/db"
+	entity "IMUbackend/internal/entity"
 	"context"
-	"fmt"
+	"os"
+
+	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 )
 
-type IMarkdownRepository interface {
-	Create(ctx context.Context, markdown entity.Markdown) error
-	Update(ctx context.Context, markdown entity.Markdown) error
-	FindByID(ctx context.Context, articleName string) (entity.Markdown, error)
-	Delete(ctx context.Context, articleName string) error
+//
+// Article = Markdown + Img
+//
+
+type IArticleRepository interface {
+	Create(ctx context.Context, tx Tx, student string, imgs []*os.File, md entity.Markdown) (uuid.UUID, error)
 }
 
-type MarkdownRepository struct {
-	client infra.IS3Client
-	bucket string
+type ArticleRepository struct {
+	query *db.Queries
+	minioClient *minio.Client
 }
 
-func NewMarkdownRepository(client infra.IS3Client, bucket string) IMarkdownRepository {
-	return &MarkdownRepository{client, bucket}
+func NewArticleRepository(query *db.Queries, minioClient *minio.Client) IArticleRepository {
+	return &ArticleRepository{query, minioClient}
 }
 
-func (m *MarkdownRepository) Create(ctx context.Context, markdown entity.Markdown) error {
-	obj, _ := m.client.Find(ctx, markdown.ArticleName, m.bucket)
-	if obj != nil {
-		return fmt.Errorf("already exists")
-	}
-	err := m.client.Create(ctx, markdown.ArticleName, markdown, m.bucket)
-	return err
-}
-
-func (m *MarkdownRepository) Update(ctx context.Context, markdown entity.Markdown) error {
-	content, err := m.client.Find(ctx, markdown.ArticleName, m.bucket)
-	if err == nil {
-		return fmt.Errorf("not found")
-	}
-	contentmd := content.(entity.Markdown)
-	if contentmd == markdown {
-		return fmt.Errorf("no changes")
-	}
-
-	err = m.client.Create(ctx, markdown.ArticleName, markdown, m.bucket)
-	return err
-}
-
-func (m *MarkdownRepository) FindByID(ctx context.Context, articleName string) (entity.Markdown, error) {
-	content, err := m.client.Find(ctx, articleName, m.bucket)
+func (a *ArticleRepository) Create(
+	ctx context.Context,
+	tx Tx,
+	student string,
+	imgs []*os.File,
+	md entity.Markdown,
+) (uuid.UUID, error) {
+	id, err := tx.Queries().CreateMarkdown(ctx, db.CreateMarkdownParams{
+		StudentID:   student,
+		Title:       md.ArticleName,
+	})
 	if err != nil {
-		return entity.Markdown{}, err
+		return uuid.UUID{}, err
 	}
 
-	contentmd, ok := content.(entity.Markdown)
-	if !ok {
-		return entity.Markdown{}, fmt.Errorf("data corrupted")
+	var imgIDs []uuid.UUID
+	// 将来的にコイツもトランザクション的な何かで処理する
+	for _, img := range imgs {
+		path, err := tx.Queries().CreateImg(ctx, img.Name())
+		if err != nil {
+			return uuid.UUID{}, err
+		}
+		imgIDs = append(imgIDs, path)
 	}
-
-	return contentmd, nil
-}
-
-func (m *MarkdownRepository) Delete(ctx context.Context, articleName string) error {
-	return m.client.Delete(ctx, articleName, m.bucket)
+	for _, imgID := range imgIDs {
+		err = tx.Queries().CreateMarkdownImgRel(ctx, db.CreateMarkdownImgRelParams{
+			MarkdownID: id,
+			ImgID:      imgID,
+		})
+		if err != nil {
+			return uuid.UUID{}, err
+		}
+	}
+	return id, nil
 }
