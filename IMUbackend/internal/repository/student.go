@@ -35,13 +35,13 @@ func (u *StudentRepository) Create(ctx context.Context, tx Tx, user db.Student) 
 	if err != nil {
 		// err is not nil, but this means that the user does not exist
 		// so we can create the user
-		tx.Queries().CreateStudent(ctx, db.CreateStudentParams{
+		_, err := tx.Queries().CreateStudent(ctx, db.CreateStudentParams{
 			ID:       user.ID,
 			Name:     user.Name,
 			Email:    user.Email,
 			Password: user.Password,
 		})
-		return nil
+		return err
 	}
 	// Already exists, so return error
 	return fmt.Errorf("already exists")

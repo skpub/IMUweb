@@ -3,7 +3,6 @@ package main
 import (
 	"IMUbackend/gen/imubackend"
 	"context"
-	"database/sql"
 	"flag"
 	"net/url"
 	"sync"
@@ -22,8 +21,6 @@ import (
 	"os/signal"
 
 	"github.com/joho/godotenv"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func main() {
@@ -70,7 +67,6 @@ func main() {
 		panic(err)
 	}
 	// bucket := os.Getenv("MDBUCKET")
-	repoMd := infrastructure.NewObjectStorageConnection(client)
 	// end minio
 
 	// postgres
@@ -86,9 +82,10 @@ func main() {
 	}
 	txManager := repository.NewSQLTxManager(db)
 	userRepo := repository.NewStudentRepository(dbb.New(db))
+	articleRepo := repository.NewArticleRepository(dbb.New(db), client)
 	// end postgres
 
-	svc := service.NewIMUSrv(repoMd, userRepo, txManager)
+	svc := service.NewIMUSrv(articleRepo, userRepo, txManager)
 	//
 	// DI END
 	//

@@ -38,8 +38,7 @@ services:
   db:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: my_postgres
+    image: postgres:latest
     container_name: imu_db
     ports:
       - 5432:5432

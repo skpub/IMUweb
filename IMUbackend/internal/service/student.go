@@ -24,6 +24,8 @@ func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error 
 	defer func() {
 		if err != nil {
 			tx.Rollback()
+		} else {
+			tx.Commit()
 		}
 	}()
 	err = s.user.Create(ctx, tx, db.Student{

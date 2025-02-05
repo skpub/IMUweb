@@ -49,7 +49,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imub
 	)
 	{
 		eh := errorHandler(ctx)
-		imubackendServer = imubackendsvr.New(imubackendEndpoints, mux, dec, enc, eh, nil)
+		imubackendServer = imubackendsvr.New(imubackendEndpoints, mux, dec, enc, eh, nil, nil)
 	}
 
 	// Configure the mux.
