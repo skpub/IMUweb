@@ -3,6 +3,7 @@ package main
 import (
 	imubackendsvr "IMUbackend/gen/http/imubackend/server"
 	imubackend "IMUbackend/gen/imubackend"
+	"IMUbackend/internal/infrastructure"
 	"context"
 	"net/http"
 	"net/url"
@@ -49,7 +50,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imub
 	)
 	{
 		eh := errorHandler(ctx)
-		imubackendServer = imubackendsvr.New(imubackendEndpoints, mux, dec, enc, eh, nil, nil)
+		imubackendServer = imubackendsvr.New(imubackendEndpoints, mux, dec, enc, eh, nil, infrastructure.MarkdownDecoder)
 	}
 
 	// Configure the mux.

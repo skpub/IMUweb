@@ -27,11 +27,13 @@ DELETE FROM student WHERE id = $1;
 -- markdown CRUD
 -- markdown C
 -- name: CreateMarkdown :one
-INSERT INTO markdown (student_id, title) VALUES ($1, $2) RETURNING id;
+INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETURNING id;
 
 -- markdown R
 -- name: FindMarkdownByID :one
 SELECT * FROM markdown WHERE id = $1;
+-- name: ListMarkdownID :many
+SELECT id FROM markdown;
 
 -- markdown U
 -- name: UpdateMarkdown :exec
@@ -84,3 +86,10 @@ SELECT i.id AS img_path
 FROM img i 
 JOIN markdown_img_rel mir ON i.id = mir.img_id
 WHERE mir.markdown_id = $1;
+
+-- name: GetArticle :many
+SELECT *
+FROM markdown m
+JOIN markdown_img_rel mir ON m.id = mir.markdown_id
+JOIN img i ON i.id = mir.img_id 
+WHERE m.id = $1;

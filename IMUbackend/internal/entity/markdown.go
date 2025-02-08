@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Markdown struct {
 	ArticleName string
@@ -11,4 +13,19 @@ type Markdown struct {
 
 func (m Markdown) Read(p []byte) (n int, err error) {
 	return copy(p, m.Content), nil
+}
+
+type NamedContent struct {
+	Name    string
+	Content []byte
+}
+
+type Article struct {
+	ID        string
+	StudentID string
+	Title     string
+	Content   string
+	Imgs      [][]byte
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

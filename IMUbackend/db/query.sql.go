@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -26,12 +27,13 @@ func (q *Queries) CreateImg(ctx context.Context, name string) (uuid.UUID, error)
 }
 
 const createMarkdown = `-- name: CreateMarkdown :one
-INSERT INTO markdown (student_id, title) VALUES ($1, $2) RETURNING id
+INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETURNING id
 `
 
 type CreateMarkdownParams struct {
-	StudentID string `json:"student_id"`
-	Title     string `json:"title"`
+	StudentID   string `json:"student_id"`
+	Title       string `json:"title"`
+	ContentPath string `json:"content_path"`
 }
 
 // Defines queries for a data unit that must maintain transactional consistency.
@@ -39,7 +41,7 @@ type CreateMarkdownParams struct {
 // markdown CRUD
 // markdown C
 func (q *Queries) CreateMarkdown(ctx context.Context, arg CreateMarkdownParams) (uuid.UUID, error) {
-	row := q.db.QueryRowContext(ctx, createMarkdown, arg.StudentID, arg.Title)
+	row := q.db.QueryRowContext(ctx, createMarkdown, arg.StudentID, arg.Title, arg.ContentPath)
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
@@ -266,6 +268,88 @@ func (q *Queries) FindStudentByID(ctx context.Context, id string) (Student, erro
 		&i.Password,
 	)
 	return i, err
+}
+
+const getArticle = `-- name: GetArticle :many
+SELECT m.id, student_id, title, content_path, since, updated, markdown_id, img_id, i.id, name
+FROM markdown m
+JOIN markdown_img_rel mir ON m.id = mir.markdown_id
+JOIN img i ON i.id = mir.img_id 
+WHERE m.id = $1
+`
+
+type GetArticleRow struct {
+	ID          uuid.UUID `json:"id"`
+	StudentID   string    `json:"student_id"`
+	Title       string    `json:"title"`
+	ContentPath string    `json:"content_path"`
+	Since       time.Time `json:"since"`
+	Updated     time.Time `json:"updated"`
+	MarkdownID  uuid.UUID `json:"markdown_id"`
+	ImgID       uuid.UUID `json:"img_id"`
+	ID_2        uuid.UUID `json:"id_2"`
+	Name        string    `json:"name"`
+}
+
+func (q *Queries) GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow, error) {
+	rows, err := q.db.QueryContext(ctx, getArticle, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetArticleRow
+	for rows.Next() {
+		var i GetArticleRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StudentID,
+			&i.Title,
+			&i.ContentPath,
+			&i.Since,
+			&i.Updated,
+			&i.MarkdownID,
+			&i.ImgID,
+			&i.ID_2,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMarkdownID = `-- name: ListMarkdownID :many
+SELECT id FROM markdown
+`
+
+func (q *Queries) ListMarkdownID(ctx context.Context) ([]uuid.UUID, error) {
+	rows, err := q.db.QueryContext(ctx, listMarkdownID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const login = `-- name: Login :exec

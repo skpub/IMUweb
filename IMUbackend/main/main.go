@@ -74,18 +74,23 @@ func main() {
 	pg_user := os.Getenv("PG_USER")
 	pg_password := os.Getenv("PG_PASSWORD")
 	pg_dbname := os.Getenv("PG_DBNAME")
+	salt := os.Getenv("SALT")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", pg_user, pg_password, pg_host, "5432", pg_dbname)
 
 	db, err := infrastructure.NewDBConnection(dsn)
 	if err != nil {
 		panic(err)
 	}
-	txManager := repository.NewSQLTxManager(db)
-	userRepo := repository.NewStudentRepository(dbb.New(db))
-	articleRepo := repository.NewArticleRepository(dbb.New(db), client)
+	dbWrapper := dbb.New(db)
+	userRepo := repository.NewStudentRepository(dbWrapper)
+	articleRepo := repository.NewArticleRepository(dbWrapper, client, "mds")
 	// end postgres
 
-	svc := service.NewIMUSrv(articleRepo, userRepo, txManager)
+	// jwt
+	jwtSecret := os.Getenv("JWT_SECRET")
+	// end jwt
+
+	svc := service.NewIMUSrv(articleRepo, userRepo, jwtSecret, salt, db)
 	//
 	// DI END
 	//

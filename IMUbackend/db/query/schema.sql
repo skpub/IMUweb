@@ -17,7 +17,7 @@ CREATE TABLE markdown (
     id              UUID DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL UNIQUE,
     student_id      VARCHAR(126) NOT NULL,
     title           VARCHAR(126) NOT NULL,
-    content_path    VARCHAR(255) NOT NULL,
+    content_path    VARCHAR(255) NOT NULL UNIQUE,
     since           TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated         TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY     (student_id) REFERENCES student(id)

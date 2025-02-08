@@ -3,18 +3,24 @@ package service
 import (
 	pb "IMUbackend/gen/imubackend"
 	repo "IMUbackend/internal/repository"
+	"database/sql"
 )
 
 type IMUSrv struct {
 	article   repo.IArticleRepository
-	user repo.IStudentRepository
-	tx   repo.TxManager
+	user      repo.IStudentRepository
+	jwtsecret string
+	salt      string
+	db        *sql.DB
 }
 
-func NewIMUSrv(article repo.IArticleRepository, user repo.IStudentRepository, txManager repo.TxManager) pb.Service {
+
+func NewIMUSrv(article repo.IArticleRepository, user repo.IStudentRepository, jwtsecret string, salt string, db *sql.DB) pb.Service {
 	return &IMUSrv{
 		article,
 		user,
-		txManager,
+		jwtsecret,
+		salt,
+		db,
 	}
 }
