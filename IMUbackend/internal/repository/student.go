@@ -16,7 +16,7 @@ type IStudentRepository interface {
 }
 
 type StudentRepository struct {
-	query *db.Queries
+	query db.Querier
 }
 
 func NewStudentRepository(query *db.Queries) IStudentRepository {

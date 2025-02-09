@@ -3,6 +3,7 @@ package repository
 import (
 	"IMUbackend/db"
 	entity "IMUbackend/internal/entity"
+	"IMUbackend/internal/infrastructure"
 	"context"
 	"io"
 	"strings"
@@ -23,12 +24,12 @@ type IArticleRepository interface {
 }
 
 type ArticleRepository struct {
-	query       *db.Queries
-	minioClient *minio.Client
+	query       db.Querier
+	minioClient infrastructure.MinioClient
 	bucket      string
 }
 
-func NewArticleRepository(query *db.Queries, minioClient *minio.Client, bucket string) IArticleRepository {
+func NewArticleRepository(query db.Querier, minioClient infrastructure.MinioClient, bucket string) IArticleRepository {
 	return &ArticleRepository{query, minioClient, bucket}
 }
 
