@@ -7,6 +7,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.84
 	goa.design/clue v1.0.7
 	goa.design/goa/v3 v3.19.1
+	goa.design/plugins/v3 v3.19.1
 )
 
 require (

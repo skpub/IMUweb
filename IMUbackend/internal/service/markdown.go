@@ -17,7 +17,13 @@ func (s *IMUSrv) ListArticle(ctx context.Context) (*pb.ListArticleResult, error)
 	}
 	ids := pb.ListArticleResult{}
 	for _, id := range idsUUID {
-		ids.Ids = append(ids.Ids, id.String())
+		idStr := id.ID.String()
+		updated := id.Updated.String()
+		ids.List = append(ids.List, &pb.ArticleIDName{
+			ID:      &idStr,
+			Name:    &id.Title,
+			Updated: &updated,
+		})
 	}
 	return &ids, nil
 }

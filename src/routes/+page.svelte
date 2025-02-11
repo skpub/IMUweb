@@ -1,11 +1,73 @@
 <script lang="ts">
   import imu_mc from '$lib/assets/IMU_minecraft.webp'
+    import { onMount } from 'svelte';
+  import type { PageProps } from './$types';
+
+  type Article = {
+    id: string
+    name: string
+    updated: string
+  }
+
+  let { data }: PageProps = $props()
+  onMount(() => {
+    get()
+  })
+  let list: Article[] = $state([])
+  function get() {
+    data["list"]["list"].forEach((element: Article) => {
+      list.push(element)
+    });
+  }
 </script>
 
 <img id="imu" src={imu_mc} alt="">
-
+<div id="article-list-container">
+  <h2 class="margin-left24">新着記事</h2>
+  <div id="article-list">
+    {#each list as item}
+    <div class="article margin-left24">
+      <p class="articleName"><b>{item["name"]}</b></p>
+      <p class="articleTime">{item["updated"]}</p>
+    </div>
+    {/each}
+  </div>
+</div>
 <style>
   #imu {
     width: 100%;
+  }
+
+  #article-list-container {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    background-color: var(--immoral-shadow);
+    #article-list {
+      flex: 1;
+      display: flex;
+      width: 100%;
+      flex-flow: column;
+      .article {
+        display: flex;
+        border-bottom: dotted 2px var(--text-color);
+        .articleName {
+          flex: 1;
+        }
+        .articleTime {
+          margin-right: 32px;
+        }
+      }
+    }
+  }
+  @media (max-width: 500px) {
+    .article {
+      flex-flow: column;
+    }
+  }
+  @media (min-width: 500px) {
+    .article {
+      flex-flow: row;
+    }
   }
 </style>

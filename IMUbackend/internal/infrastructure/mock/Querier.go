@@ -414,6 +414,36 @@ func (_m *Querier) GetArticle(ctx context.Context, id uuid.UUID) ([]db.GetArticl
 	return r0, r1
 }
 
+// ListMarkdown provides a mock function with given fields: ctx
+func (_m *Querier) ListMarkdown(ctx context.Context) ([]db.ListMarkdownRow, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListMarkdown")
+	}
+
+	var r0 []db.ListMarkdownRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]db.ListMarkdownRow, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []db.ListMarkdownRow); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ListMarkdownRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListMarkdownID provides a mock function with given fields: ctx
 func (_m *Querier) ListMarkdownID(ctx context.Context) ([]uuid.UUID, error) {
 	ret := _m.Called(ctx)

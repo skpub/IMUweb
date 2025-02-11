@@ -325,6 +325,39 @@ func (q *Queries) GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow
 	return items, nil
 }
 
+const listMarkdown = `-- name: ListMarkdown :many
+SELECT id, title, updated FROM markdown
+`
+
+type ListMarkdownRow struct {
+	ID      uuid.UUID `json:"id"`
+	Title   string    `json:"title"`
+	Updated time.Time `json:"updated"`
+}
+
+func (q *Queries) ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMarkdown)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMarkdownRow
+	for rows.Next() {
+		var i ListMarkdownRow
+		if err := rows.Scan(&i.ID, &i.Title, &i.Updated); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listMarkdownID = `-- name: ListMarkdownID :many
 SELECT id FROM markdown
 `

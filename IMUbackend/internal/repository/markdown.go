@@ -19,7 +19,7 @@ import (
 
 type IArticleRepository interface {
 	Create(ctx context.Context, student string, imgs []*entity.NamedContent, md entity.Markdown) (uuid.UUID, error)
-	ListAll(ctx context.Context) ([]uuid.UUID, error)
+	ListAll(ctx context.Context) ([]db.ListMarkdownRow, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Article, error)
 }
 
@@ -86,8 +86,8 @@ func (a *ArticleRepository) Create(
 	return markdownID, nil
 }
 
-func (a *ArticleRepository) ListAll(ctx context.Context) ([]uuid.UUID, error) {
-	id, err := a.query.ListMarkdownID(ctx)
+func (a *ArticleRepository) ListAll(ctx context.Context) ([]db.ListMarkdownRow, error) {
+	id, err := a.query.ListMarkdown(ctx)
 	if err != nil {
 		return nil, err
 	}

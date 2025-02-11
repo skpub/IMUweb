@@ -34,6 +34,8 @@ INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETUR
 SELECT * FROM markdown WHERE id = $1;
 -- name: ListMarkdownID :many
 SELECT id FROM markdown;
+-- name: ListMarkdown :many
+SELECT id, title, updated FROM markdown;
 
 -- markdown U
 -- name: UpdateMarkdown :exec

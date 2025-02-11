@@ -2,6 +2,7 @@ package design
 
 import (
 	. "goa.design/goa/v3/dsl"
+	cors "goa.design/plugins/v3/cors/dsl"
 )
 
 var JWTAuth = JWTSecurity("jwt", func() {
@@ -15,6 +16,12 @@ var _ = API("imubackend", func() {
 			URI("http://localhost:8080")
 		})
 	})
+})
+
+var ArticleIdName = Type("ArticleIdName", func() {
+	Attribute("id", String)
+	Attribute("name", String)
+	Attribute("updated", String)
 })
 
 var File = Type("file", func() {
@@ -36,6 +43,7 @@ var SignupAttribute = Type("Signup", func() {
 
 var _ = Service("imubackend", func() {
 	Description("markdown file server")
+	cors.Origin("*")
 
 	HTTP(func() {
 		Path("/api")
@@ -63,7 +71,7 @@ var _ = Service("imubackend", func() {
 	Method("listArticle", func() {
 		Description("list article")
 		Result(func() {
-			Attribute("ids", ArrayOf(String))
+			Attribute("list", ArrayOf(ArticleIdName))
 		})
 		HTTP(func() {
 			GET("/article/list")
