@@ -127,7 +127,10 @@ func (a *ArticleRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity
 		if err != nil {
 			return &entity.Article{}, err
 		}
-		article.Imgs = append(article.Imgs, imgBytes)
+		article.Imgs = append(article.Imgs, &entity.NamedContent{
+			Name:    imgPath.String(),
+			Content: imgBytes,
+		})
 	}
 	return article, nil
 }

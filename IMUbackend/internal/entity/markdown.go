@@ -25,7 +25,7 @@ type Article struct {
 	StudentID string
 	Title     string
 	Content   string
-	Imgs      [][]byte
+	Imgs      []*NamedContent
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

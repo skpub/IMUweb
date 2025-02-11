@@ -5,6 +5,7 @@ import (
 	entity "IMUbackend/internal/entity"
 	"IMUbackend/internal/infrastructure"
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ func TestCreate_Success(t *testing.T) {
 	ctx := context.Background()
 
 	
-	t.Run("Success (Create article with some imgs.)", func(t *testing.T) {
+	t.Run("Create: Success (Create article with some imgs)", func(t *testing.T) {
 		imgs := make([]*entity.NamedContent, 0)
 		img := &entity.NamedContent{
 			Name:    "test",
@@ -49,8 +50,9 @@ func TestCreate_Success(t *testing.T) {
 
 		_, err := articleRepo.Create(ctx, "student", imgs, md)
 		assert.NoError(t, err)
+		qm.ExpectedCalls = nil
 	})
-	t.Run("Success (Create article without imgs.)", func(t *testing.T) {
+	t.Run("Create: Success (Create article without imgs)", func(t *testing.T) {
 		md := entity.Markdown{
 			ArticleName: "test",
 			Content:     "test",
@@ -63,5 +65,21 @@ func TestCreate_Success(t *testing.T) {
 
 		_, err := articleRepo.Create(ctx, "student", nil, md)
 		assert.NoError(t, err)
+		qm.ExpectedCalls = nil
+	})
+	t.Run("Create: Fail (Can't create markdown)", func(t *testing.T) {
+		md := entity.Markdown{
+			ArticleName: "test",
+			Content:     "test",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+		qm.On("CreateMarkdown", mocker.Anything, mocker.Anything).Return(nil, fmt.Errorf("test"))
+		//
+		// No other calls expected.
+		// 
+		_, err := articleRepo.Create(ctx, "student", nil, md)
+		assert.Error(t, err)
+		qm.ExpectedCalls = nil
 	})
 }

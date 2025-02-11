@@ -4,6 +4,7 @@ import (
 	pb "IMUbackend/gen/imubackend"
 	entity "IMUbackend/internal/entity"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -32,11 +33,12 @@ func (s *IMUSrv) GetArticle(ctx context.Context, p *pb.GetArticlePayload) (*pb.G
 	}
 	imgFiles := make([]*pb.File, 0)
 	for _, img := range article.Imgs {
-		var imgFileName *string
+		imgFileName := new(string)
 		*imgFileName = "test"
-		imgFile := &pb.File{}
-		imgFile.Name = imgFileName
-		imgFile.Content = img
+		imgFile := &pb.File{
+			Name:    imgFileName,
+			Content: img.Content,
+		}
 		imgFiles = append(imgFiles, imgFile)
 	}
 	created := article.CreatedAt.String()
@@ -54,26 +56,34 @@ func (s *IMUSrv) GetArticle(ctx context.Context, p *pb.GetArticlePayload) (*pb.G
 }
 
 func (s *IMUSrv) CreateArticle(ctx context.Context, p *pb.CreateArticlePayload) error {
-	studentId := ctx.Value("studentId").(string)
+	studentId, ok := ctx.Value("studentId").(string)
+	if !ok {
+		return fmt.Errorf("failed to get studentId. set studentId in context")
+	}
+	now := time.Now()
 	md := entity.Markdown{
 		ArticleName: p.ArticleName,
 		Content:     p.Content,
-		CreatedAt:   time.Now(),
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			s.db.Rollback(tx)
+		} else {
+			s.db.Commit(tx)
 		}
 	}()
 
 	imgs := make([]*entity.NamedContent, 0)
 	for _, pImg := range p.Image {
-		img := &entity.NamedContent{}
-		img.Name = *pImg.Name
-		img.Content = pImg.Content
+		img := &entity.NamedContent{
+			Name:    *pImg.Name,
+			Content: pImg.Content,
+		}
 		imgs = append(imgs, img)
 	}
 	_, err = s.article.Create(ctx, studentId, imgs, md)

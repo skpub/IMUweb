@@ -23,7 +23,7 @@ var File = Type("file", func() {
 })
 
 var LoginAttribute = Type("Login", func() {
-	Attribute("studentName", String)
+	Attribute("studentId", String)
 	Attribute("password", String)
 })
 

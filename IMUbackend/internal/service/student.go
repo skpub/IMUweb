@@ -28,14 +28,14 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	}
 
 	// DB query
-	err = s.user.Login(ctx, *attribute.StudentName, pwhashstr)
+	err = s.user.Login(ctx, *attribute.StudentID, pwhashstr)
 	if err != nil {
 		return "", err
 	}
 
 	// create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims {
-		"student_id": *attribute.StudentName,
+		"student_id": *attribute.StudentID,
 		"exp": time.Now().Add(time.Minute * 5).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(s.jwtsecret))
@@ -53,9 +53,9 @@ func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error 
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			s.db.Rollback(tx)
 		} else {
-			tx.Commit()
+			s.db.Commit(tx)
 		}
 	}()
 
@@ -64,10 +64,11 @@ func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error 
 		return err
 	}
 
-	return s.user.Create(ctx, db.Student{
+	err = s.user.Create(ctx, db.Student{
 		ID:       *attribute.StudentID,
 		Name:     *attribute.StudentName,
 		Password: pwhashstr,
 		Email:    *attribute.Email,
 	})
+	return err
 }

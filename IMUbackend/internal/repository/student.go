@@ -10,7 +10,7 @@ import (
 type IStudentRepository interface {
 	Create(ctx context.Context, user db.Student) error
 	UpdateBio(ctx context.Context, id string, bio string) error
-	FindByID(ctx context.Context, id string) (*db.Student, error)
+	FindByID(ctx context.Context, id string) (db.Student, error)
 	Login(ctx context.Context, id string, password string) error
 	Delete(ctx context.Context, id string) error
 }
@@ -19,7 +19,7 @@ type StudentRepository struct {
 	query db.Querier
 }
 
-func NewStudentRepository(query *db.Queries) IStudentRepository {
+func NewStudentRepository(query db.Querier) IStudentRepository {
 	return &StudentRepository{query}
 }
 
@@ -63,10 +63,10 @@ func (u *StudentRepository) UpdateBio(ctx context.Context, id string, bio string
 	})
 }
 
-func (u *StudentRepository) FindByID(ctx context.Context, articleName string) (*db.Student, error) {
-	return &db.Student{}, nil
+func (u *StudentRepository) FindByID(ctx context.Context, studentId string) (db.Student, error) {
+	return u.query.FindStudentByID(ctx, studentId)
 }
 
-func (u *StudentRepository) Delete(ctx context.Context, articleName string) error {
-	return nil
+func (u *StudentRepository) Delete(ctx context.Context, studentId string) error {
+	return u.query.DeleteStudent(ctx, studentId)
 }
