@@ -2,12 +2,14 @@
   import { goto } from '$app/navigation';
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
+  import hamburger from '$lib/assets/hamburger.svg'
   import { onMount } from 'svelte';
 
   let { children } = $props()
   // 0: dark
   // 1: light
   let theme = $state(false)
+  let hamburger_active = $state(false)
 
   $effect(() => {
     if (theme) {
@@ -51,14 +53,24 @@
 </script>
 
 <header>
-    <div id="logo" class="clickable" on:click={() => goto('/')}>
+    <div id="logo" class="clickable" on:click={() => {goto('/'); hamburger_active = false}}>
       <img id="imu-logo" src={imu_logo} alt="IMU Logo" />
       <div id="imu-text-logo" style='mask-image: url("{imu_text_logo}");'></div>
     </div>
     <div id="contents">
-      {#each contents as content} 
-        <a href={`/${content.link}`}>{content.name}</a>
-      {/each}
+      <div id="contents_list_pc">
+        {#each contents as content} 
+          <a href={`/${content.link}`}>{content.name}</a>
+        {/each}
+      </div>
+      <div id="contents_list_mobile">
+        <div id="hamburger" class="clickable" style='mask-image: url("{hamburger}");' on:click={() => hamburger_active = !hamburger_active}></div>
+        <nav class:active={hamburger_active}>
+          {#each contents as content} 
+            <a href={`/${content.link}`} on:click={() => hamburger_active = false}>{content.name}</a>
+          {/each}
+        </nav>
+      </div>
     </div>
 </header>
 <main>
@@ -76,6 +88,8 @@
     --immoral-light-darker: hsl(0, 31%, 50%);
     --black: #2a2a2a;
     --white: #f5f5f5;
+    --emphasis-dark: hsl(0, 100%, 78%);
+    --emphasis-light: hsl(0, 100%, 30%);
   }
   :global(a) {
     color: var(--immoral-text);
@@ -102,15 +116,24 @@
     --text-color: var(--white);
     --immoral-text: var(--immoral-light);
     --key-color: var(--immoral-light);
+    --emphasis: var(--emphasis-dark);
   }
   :root.light {
     --bg-color: var(--white);
     --text-color: var(--black);
     --immoral-text: var(--immoral-light-darker);
     --key-color: var(--immoral-shadow);
+    --emphasis: var(--emphasis-light);
+  }
+  main {
+    /* margin-top: 90px; */
   }
   header {
     display: flex;
+    position: sticky;
+    left: 0;
+    top: 0;
+    width: 100dvw;
     flex-direction: row;
     align-items: center;
     background-color: var(--bg-color);
@@ -144,6 +167,59 @@
         margin: 10px;
         color: var(--white);
       }
+    }
+    #contents_list_mobile {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      #hamburger {
+        margin: 0 auto;
+        width: 30px;
+        height: 30px;
+        background-color: white !important;
+        mask-repeat: no-repeat;
+        mask-position: center;
+      }
+      nav.active {
+        display: flex;
+        opacity: 90%;
+        flex-direction: column;
+        position: absolute;
+        width: 300px;
+        backdrop-filter: blur(10px);
+        top: 90px;
+        right: 0;
+        background-color: var(--immoral-shadow);
+        a {
+          margin: 10px;
+          color: var(--white);
+        }
+      }
+      nav {
+        display: none;
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    #contents_list_pc {
+      display: none;
+    }
+    #logo {
+      position: fixed;
+      width: 100dvw;
+    }
+    #contents {
+      background: none !important;
+      position: fixed;
+      right: 0;
+      width: 90px;
+      height: 90px !important;
+    }
+  }
+  @media (min-width: 768px) {
+    #contents_list_mobile {
+      display: none !important;
     }
   }
 
