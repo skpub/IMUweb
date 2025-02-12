@@ -3,7 +3,7 @@
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
   import hamburger from '$lib/assets/hamburger.svg'
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let { children } = $props()
   // 0: dark
@@ -21,6 +21,11 @@
     }
   })
 
+  function closeHamburger(e: any) {
+    if (e.target.id !== 'hamburger') {
+      hamburger_active = false
+    }
+  }
 
   onMount(() => {
     const theme_observer_DOM = document.getElementById('is-darkmode')
@@ -52,8 +57,10 @@
   ]
 </script>
 
+<svelte:window onclick={closeHamburger} />
+
 <header>
-    <div id="logo" class="clickable" on:click={() => {goto('/'); hamburger_active = false}}>
+    <div id="logo" class="clickable" onclick={() => {goto('/'); hamburger_active = false}}>
       <img id="imu-logo" src={imu_logo} alt="IMU Logo" />
       <div id="imu-text-logo" style='mask-image: url("{imu_text_logo}");'></div>
     </div>
@@ -64,10 +71,10 @@
         {/each}
       </div>
       <div id="contents_list_mobile">
-        <div id="hamburger" class="clickable" style='mask-image: url("{hamburger}");' on:click={() => hamburger_active = !hamburger_active}></div>
+        <div id="hamburger" class="clickable" style='mask-image: url("{hamburger}");' onclick={() => hamburger_active = !hamburger_active}></div>
         <nav class:active={hamburger_active}>
           {#each contents as content} 
-            <a href={`/${content.link}`} on:click={() => hamburger_active = false}>{content.name}</a>
+            <a href={`/${content.link}`} onclick={() => hamburger_active = false}>{content.name}</a>
           {/each}
         </nav>
       </div>
@@ -83,8 +90,9 @@
     margin: 0;
   }
   :global(:root) {
-    --immoral-shadow: hsl(275, 8%, 53%);
-    --immoral-light: hsl(0, 31%, 88%);
+    --immoral-shadow: hsl(275, 10%, 45%);
+    --immoral-shadow-darker: hsl(275, 10%, 30%);
+    --immoral-light: hsl(0, 60%, 78%);
     --immoral-light-darker: hsl(0, 31%, 50%);
     --black: #2a2a2a;
     --white: #f5f5f5;

@@ -47,12 +47,17 @@
 <style>
   #imu {
     width: 100%;
+    display: block;
   }
 
   #article-list-container {
+    h2 {
+      margin-top: 13px;
+    }
     display: flex;
     flex-flow: row;
     width: 100%;
+    color: var(--white);
     background-color: var(--immoral-shadow);
     #article-list {
       flex: 1;
@@ -61,13 +66,18 @@
       flex-flow: column;
       .article {
         display: flex;
-        border-bottom: dotted 2px var(--text-color);
+        border-bottom: dotted 2px var(--white);
         .articleName {
+          margin-left: 12px;
           flex: 1;
         }
         .articleTime {
           margin-right: 32px;
         }
+      }
+      .article:hover {
+        background-color: var(--immoral-shadow-darker);
+        transition: background-color 0.3s ease;
       }
     }
   }
