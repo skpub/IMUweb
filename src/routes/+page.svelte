@@ -8,6 +8,11 @@
     name: string
     updated: string
   }
+  type ArticleGot = {
+    id: string,
+    name: string,
+    updated: bigint
+  }
 
   let { data }: PageProps = $props()
   onMount(() => {
@@ -15,8 +20,14 @@
   })
   let list: Article[] = $state([])
   function get() {
-    data["list"]["list"].forEach((element: Article) => {
-      list.push(element)
+    data["list"]["list"].forEach((element: ArticleGot) => {
+      let dateTime = new Date(Number(element["updated"]) * 1000)
+      const article: Article = {
+        id: element["id"],
+        name: element["name"],
+        updated: dateTime.toLocaleString()
+      }
+      list.push(article)
     });
   }
 </script>

@@ -18,7 +18,7 @@ func (s *IMUSrv) ListArticle(ctx context.Context) (*pb.ListArticleResult, error)
 	ids := pb.ListArticleResult{}
 	for _, id := range idsUUID {
 		idStr := id.ID.String()
-		updated := id.Updated.String()
+		updated := id.Updated.Unix()
 		ids.List = append(ids.List, &pb.ArticleIDName{
 			ID:      &idStr,
 			Name:    &id.Title,
@@ -47,8 +47,8 @@ func (s *IMUSrv) GetArticle(ctx context.Context, p *pb.GetArticlePayload) (*pb.G
 		}
 		imgFiles = append(imgFiles, imgFile)
 	}
-	created := article.CreatedAt.String()
-	updated := article.UpdatedAt.String()
+	created := article.CreatedAt.Unix()
+	updated := article.UpdatedAt.Unix()
 	articleRet := &pb.GetArticleResult{
 		ID:          &article.ID,
 		StudentID:   &article.StudentID,

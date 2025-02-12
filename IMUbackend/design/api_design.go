@@ -21,7 +21,7 @@ var _ = API("imubackend", func() {
 var ArticleIdName = Type("ArticleIdName", func() {
 	Attribute("id", String)
 	Attribute("name", String)
-	Attribute("updated", String)
+	Attribute("updated", Int64)
 })
 
 var File = Type("file", func() {
@@ -90,8 +90,8 @@ var _ = Service("imubackend", func() {
 			Attribute("articleName", String)
 			Attribute("content", String)
 			Attribute("image", ArrayOf(File))
-			Attribute("createdAt", String)
-			Attribute("updatedAt", String)
+			Attribute("createdAt", Int64)
+			Attribute("updatedAt", Int64)
 		})
 		HTTP(func() {
 			GET("/article/get")
