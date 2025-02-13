@@ -1,14 +1,16 @@
 <script lang="ts">
+  import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from '$env/static/public'
   import imu_mc from '$lib/assets/IMU_minecraft.webp'
-    import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import type { PageProps } from './$types';
+    import { marked } from 'marked';
 
-  type Article = {
+  type ArticleHead = {
     id: string
     name: string
     updated: string
   }
-  type ArticleGot = {
+  type ArticleHeadGot = {
     id: string,
     name: string,
     updated: bigint
@@ -18,17 +20,63 @@
   onMount(() => {
     get()
   })
-  let list: Article[] = $state([])
+  let list: ArticleHead[] = $state([])
   function get() {
-    data["list"]["list"].forEach((element: ArticleGot) => {
+    data["list"]["list"].forEach((element: ArticleHeadGot) => {
       let dateTime = new Date(Number(element["updated"]) * 1000)
-      const article: Article = {
+      const article: ArticleHead = {
         id: element["id"],
         name: element["name"],
         updated: dateTime.toLocaleString()
       }
       list.push(article)
     });
+  }
+
+  let images: Record<string, string> = $state({})
+
+  type Article = {
+    title: string,
+    content: string,
+  }
+  let article: Article | undefined = $state(undefined)
+  let parsedArticle = $state("")
+
+  function arrayBufferToDataURL(binary: string, mimeType: string): string {
+    const buffer = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      buffer[i] = binary.charCodeAt(i)
+    }
+    const blob = new Blob([buffer], { type: mimeType })
+    return URL.createObjectURL(blob)
+  }
+
+  const getArticle = async (id: string) => {
+    const res = await fetch(PUBLIC_BACKEND_ADDR + ':' + PUBLIC_BACKEND_PORT + '/api/article/get/' + id)
+    const data = await res.json()
+    const article_: Article = {
+      title: data["articleName"],
+      content: data["content"]
+    }
+    article = article_
+    data["image"].forEach((element: Record<string, any>) => {
+      const mimeType = element["name"].includes(".png") ? "image/png" : "image/jpeg"
+      const binary = atob(element["content"])
+      images[element["name"]] = arrayBufferToDataURL(binary, mimeType)
+      console.log(element["content"])
+    });
+    parsedArticle = await processMarkdown(article.content)
+  }
+
+  async function processMarkdown(md: string): Promise<string> {
+    const renderer = new marked.Renderer()
+    renderer.image = ({ href, title, text }) => {
+      const dataURL = images[href.slice(2)] || images[href] || href
+      //                          ↑ これ、 ./img.png みたいなのを想定している。
+      //                            将来的にはちゃんと正規表現で書くか、CMS側を作ってからどうにかする。
+      return `<img src="${dataURL}" alt="${text}" title="${title || ''}"/>`
+    }
+    return await marked(md, { renderer })
   }
 </script>
 
@@ -37,12 +85,15 @@
   <h2 class="margin-left24">新着記事</h2>
   <div id="article-list">
     {#each list as item}
-    <div class="article margin-left24">
+    <div class="articleSelection margin-left24" onclick={() => getArticle(item["id"])}>
       <p class="articleName"><b>{item["name"]}</b></p>
       <p class="articleTime">{item["updated"]}</p>
     </div>
     {/each}
   </div>
+</div>
+<div id="article" class="margin-case">
+  {@html parsedArticle}
 </div>
 <style>
   #imu {
@@ -64,7 +115,7 @@
       display: flex;
       width: 100%;
       flex-flow: column;
-      .article {
+      .articleSelection {
         display: flex;
         border-bottom: dotted 2px var(--white);
         .articleName {
@@ -75,19 +126,29 @@
           margin-right: 32px;
         }
       }
-      .article:hover {
+      .articleSelection:hover {
         background-color: var(--immoral-shadow-darker);
         transition: background-color 0.3s ease;
       }
     }
   }
+  #article {
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  :global(#article img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
   @media (max-width: 500px) {
-    .article {
+    .articleSelection {
       flex-flow: column;
     }
   }
   @media (min-width: 500px) {
-    .article {
+    .articleSelection {
       flex-flow: row;
     }
   }

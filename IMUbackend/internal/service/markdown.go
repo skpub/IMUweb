@@ -4,9 +4,8 @@ import (
 	pb "IMUbackend/gen/imubackend"
 	entity "IMUbackend/internal/entity"
 	"context"
-	"fmt"
 	"time"
-
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -28,8 +27,8 @@ func (s *IMUSrv) ListArticle(ctx context.Context) (*pb.ListArticleResult, error)
 	return &ids, nil
 }
 
-func (s *IMUSrv) GetArticle(ctx context.Context, p *pb.GetArticlePayload) (*pb.GetArticleResult, error) {
-	id, err := uuid.Parse(*p.ID)
+func (s *IMUSrv) GetArticle(ctx context.Context, p string) (*pb.GetArticleResult, error) {
+	id, err := uuid.Parse(p)
 	if err != nil {
 		return nil, err
 	}
@@ -37,15 +36,16 @@ func (s *IMUSrv) GetArticle(ctx context.Context, p *pb.GetArticlePayload) (*pb.G
 	if err != nil {
 		return nil, err
 	}
-	imgFiles := make([]*pb.File, 0)
-	for _, img := range article.Imgs {
-		imgFileName := new(string)
-		*imgFileName = "test"
-		imgFile := &pb.File{
-			Name:    imgFileName,
-			Content: img.Content,
+	var imgFiles []*pb.File
+	if len(article.Imgs) > 0 {
+		imgFiles = make([]*pb.File, 0, len(article.Imgs))
+		for _, img := range article.Imgs {
+			imgFile := &pb.File{
+				Name:    &img.Name,
+				Content: img.Content,
+			}
+			imgFiles = append(imgFiles, imgFile)
 		}
-		imgFiles = append(imgFiles, imgFile)
 	}
 	created := article.CreatedAt.Unix()
 	updated := article.UpdatedAt.Unix()

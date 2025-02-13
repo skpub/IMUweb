@@ -134,14 +134,16 @@
     --emphasis: var(--emphasis-light);
   }
   main {
+    /* display: flex; */
     /* margin-top: 90px; */
   }
   header {
     display: flex;
     position: sticky;
+    position: -webkit-sticky;
+    will-change: transform; /* for Safari */
     left: 0;
     top: 0;
-    width: 100dvw;
     flex-direction: row;
     align-items: center;
     background-color: var(--bg-color);
@@ -237,7 +239,7 @@
     }
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 769px) {
     #contents {
       background: var(--immoral-shadow);
       #contents_list_mobile {

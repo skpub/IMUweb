@@ -50,9 +50,8 @@ func TestArticle(t *testing.T) {
 		ctx := context.Background()
 		argUUID := uuid.New()
 		argUUIDStr := argUUID.String()
-		arg := pb.GetArticlePayload{ ID: &argUUIDStr }
 		article.On("FindByID", ctx, argUUID).Return(&entity.Article{}, nil)
-		result, err := srv.GetArticle(ctx, &arg)
+		result, err := srv.GetArticle(ctx, argUUIDStr)
 		assert.NoError(t, err)
 		assert.NotNil(t, result)
 		article.ExpectedCalls = nil
@@ -61,9 +60,8 @@ func TestArticle(t *testing.T) {
 		ctx := context.Background()
 		argUUID := uuid.New()
 		argUUIDStr := argUUID.String()
-		arg := pb.GetArticlePayload{ ID: &argUUIDStr }
 		article.On("FindByID", ctx, argUUID).Return(nil, fmt.Errorf("test"))
-		result, err := srv.GetArticle(ctx, &arg)
+		result, err := srv.GetArticle(ctx, argUUIDStr)
 		assert.Error(t, err)
 		assert.Nil(t, result)
 	}) 

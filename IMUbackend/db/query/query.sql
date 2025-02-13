@@ -92,6 +92,6 @@ WHERE mir.markdown_id = $1;
 -- name: GetArticle :many
 SELECT *
 FROM markdown m
-JOIN markdown_img_rel mir ON m.id = mir.markdown_id
-JOIN img i ON i.id = mir.img_id 
+LEFT JOIN markdown_img_rel mir ON m.id = mir.markdown_id
+LEFT JOIN img i ON i.id = mir.img_id 
 WHERE m.id = $1;

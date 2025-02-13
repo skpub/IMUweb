@@ -2,7 +2,6 @@ package design
 
 import (
 	. "goa.design/goa/v3/dsl"
-	cors "goa.design/plugins/v3/cors/dsl"
 )
 
 var JWTAuth = JWTSecurity("jwt", func() {
@@ -43,8 +42,6 @@ var SignupAttribute = Type("Signup", func() {
 
 var _ = Service("imubackend", func() {
 	Description("markdown file server")
-	cors.Origin("*")
-
 	HTTP(func() {
 		Path("/api")
 	})
@@ -81,9 +78,10 @@ var _ = Service("imubackend", func() {
 
 	Method("getArticle", func() {
 		Description("get article")
-		Payload(func() {
-			Attribute("id", String)
-		})
+		// Payload(func() {
+		// 	Attribute("id", String)
+		// })
+		Payload(String)
 		Result(func() {
 			Attribute("id", String)
 			Attribute("studentID", String)
@@ -94,7 +92,8 @@ var _ = Service("imubackend", func() {
 			Attribute("updatedAt", Int64)
 		})
 		HTTP(func() {
-			GET("/article/get")
+			GET("/article/get/{id}")
+			Param("id", String)
 			Response(StatusOK)
 		})
 	})
@@ -109,6 +108,7 @@ var _ = Service("imubackend", func() {
 		})
 	})
 	Method("login", func() {
+		NoSecurity()
 		Description("IMU teacher and student login")
 		Payload(LoginAttribute)
 		Result(String)
