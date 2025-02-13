@@ -4,6 +4,7 @@ import (
 	"IMUbackend/db"
 	entity "IMUbackend/internal/entity"
 	"IMUbackend/internal/infrastructure"
+	"bytes"
 	"context"
 	"io"
 	"strings"
@@ -19,7 +20,7 @@ import (
 
 type IArticleRepository interface {
 	Create(ctx context.Context, student string, imgs []*entity.NamedContent, md entity.Markdown) (uuid.UUID, error)
-	ListAll(ctx context.Context) ([]uuid.UUID, error)
+	ListAll(ctx context.Context) ([]db.ListMarkdownRow, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Article, error)
 }
 
@@ -77,7 +78,7 @@ func (a *ArticleRepository) Create(
 
 		// minio
 		// 将来的にコイツもトランザクション的な何かで処理する
-		imgRdr := strings.NewReader(md.Content)
+		imgRdr := bytes.NewReader(img.Content)
 		_, err = a.minioClient.PutObject(ctx, a.bucket, imgPath.String(), imgRdr, -1, minio.PutObjectOptions{})
 		if err != nil {
 			return uuid.UUID{}, err
@@ -86,8 +87,8 @@ func (a *ArticleRepository) Create(
 	return markdownID, nil
 }
 
-func (a *ArticleRepository) ListAll(ctx context.Context) ([]uuid.UUID, error) {
-	id, err := a.query.ListMarkdownID(ctx)
+func (a *ArticleRepository) ListAll(ctx context.Context) ([]db.ListMarkdownRow, error) {
+	id, err := a.query.ListMarkdown(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -98,37 +99,37 @@ func (a *ArticleRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity
 	article := &entity.Article{}
 	r, err := a.query.GetArticle(ctx, id)
 	if err != nil {
-		return &entity.Article{}, err
-	}
-	if len(r) == 0 {
-		return &entity.Article{}, nil
+		return nil, err
 	}
 	article.ID = r[0].ID.String()
 	article.StudentID = r[0].StudentID
 	article.Title = r[0].Title
 	mdFile, err := a.minioClient.GetObject(ctx, a.bucket, r[0].ContentPath, minio.GetObjectOptions{})
 	if err != nil {
-		return &entity.Article{}, err
+		return nil, err
 	}
 	md, err := io.ReadAll(mdFile)
 	if err != nil {
-		return &entity.Article{}, err
+		return nil, err
 	}
 	article.Content = string(md)
 	article.CreatedAt = r[0].Since
 	article.UpdatedAt = r[0].Updated
+	if len(r) < 2 {
+		return article, nil
+	}
 	for _, record := range r {
-		imgPath := record.ImgID
-		img, err := a.minioClient.GetObject(ctx, a.bucket, imgPath.String(), minio.GetObjectOptions{})
+		imgPath := record.ID_2.UUID.String()
+		img, err := a.minioClient.GetObject(ctx, a.bucket, imgPath, minio.GetObjectOptions{})
 		if err != nil {
-			return &entity.Article{}, err
+			return nil, err
 		}
 		imgBytes, err := io.ReadAll(img)
 		if err != nil {
-			return &entity.Article{}, err
+			return nil, err
 		}
 		article.Imgs = append(article.Imgs, &entity.NamedContent{
-			Name:    imgPath.String(),
+			Name:    record.Name.String,
 			Content: imgBytes,
 		})
 	}

@@ -34,6 +34,8 @@ INSERT INTO markdown (student_id, title, content_path) VALUES ($1, $2, $3) RETUR
 SELECT * FROM markdown WHERE id = $1;
 -- name: ListMarkdownID :many
 SELECT id FROM markdown;
+-- name: ListMarkdown :many
+SELECT id, title, updated FROM markdown;
 
 -- markdown U
 -- name: UpdateMarkdown :exec
@@ -90,6 +92,6 @@ WHERE mir.markdown_id = $1;
 -- name: GetArticle :many
 SELECT *
 FROM markdown m
-JOIN markdown_img_rel mir ON m.id = mir.markdown_id
-JOIN img i ON i.id = mir.img_id 
+LEFT JOIN markdown_img_rel mir ON m.id = mir.markdown_id
+LEFT JOIN img i ON i.id = mir.img_id 
 WHERE m.id = $1;

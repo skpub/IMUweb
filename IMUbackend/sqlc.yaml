@@ -19,5 +19,6 @@ sql:
 overrides:
     go: null
 plugins: []
-rules: []
+rules:
+  - 
 options: {}

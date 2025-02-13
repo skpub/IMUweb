@@ -273,22 +273,22 @@ func (q *Queries) FindStudentByID(ctx context.Context, id string) (Student, erro
 const getArticle = `-- name: GetArticle :many
 SELECT m.id, student_id, title, content_path, since, updated, markdown_id, img_id, i.id, name
 FROM markdown m
-JOIN markdown_img_rel mir ON m.id = mir.markdown_id
-JOIN img i ON i.id = mir.img_id 
+LEFT JOIN markdown_img_rel mir ON m.id = mir.markdown_id
+LEFT JOIN img i ON i.id = mir.img_id 
 WHERE m.id = $1
 `
 
 type GetArticleRow struct {
-	ID          uuid.UUID `json:"id"`
-	StudentID   string    `json:"student_id"`
-	Title       string    `json:"title"`
-	ContentPath string    `json:"content_path"`
-	Since       time.Time `json:"since"`
-	Updated     time.Time `json:"updated"`
-	MarkdownID  uuid.UUID `json:"markdown_id"`
-	ImgID       uuid.UUID `json:"img_id"`
-	ID_2        uuid.UUID `json:"id_2"`
-	Name        string    `json:"name"`
+	ID          uuid.UUID      `json:"id"`
+	StudentID   string         `json:"student_id"`
+	Title       string         `json:"title"`
+	ContentPath string         `json:"content_path"`
+	Since       time.Time      `json:"since"`
+	Updated     time.Time      `json:"updated"`
+	MarkdownID  uuid.NullUUID  `json:"markdown_id"`
+	ImgID       uuid.NullUUID  `json:"img_id"`
+	ID_2        uuid.NullUUID  `json:"id_2"`
+	Name        sql.NullString `json:"name"`
 }
 
 func (q *Queries) GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow, error) {
@@ -312,6 +312,39 @@ func (q *Queries) GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow
 			&i.ID_2,
 			&i.Name,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMarkdown = `-- name: ListMarkdown :many
+SELECT id, title, updated FROM markdown
+`
+
+type ListMarkdownRow struct {
+	ID      uuid.UUID `json:"id"`
+	Title   string    `json:"title"`
+	Updated time.Time `json:"updated"`
+}
+
+func (q *Queries) ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error) {
+	rows, err := q.db.QueryContext(ctx, listMarkdown)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMarkdownRow
+	for rows.Next() {
+		var i ListMarkdownRow
+		if err := rows.Scan(&i.ID, &i.Title, &i.Updated); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

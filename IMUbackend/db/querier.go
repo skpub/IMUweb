@@ -47,6 +47,7 @@ type Querier interface {
 	// student R
 	FindStudentByID(ctx context.Context, id string) (Student, error)
 	GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow, error)
+	ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error)
 	ListMarkdownID(ctx context.Context) ([]uuid.UUID, error)
 	Login(ctx context.Context, arg LoginParams) error
 	// img U

@@ -17,6 +17,12 @@ var _ = API("imubackend", func() {
 	})
 })
 
+var ArticleIdName = Type("ArticleIdName", func() {
+	Attribute("id", String)
+	Attribute("name", String)
+	Attribute("updated", Int64)
+})
+
 var File = Type("file", func() {
 	Attribute("name", String)
 	Attribute("content", Bytes)
@@ -36,7 +42,6 @@ var SignupAttribute = Type("Signup", func() {
 
 var _ = Service("imubackend", func() {
 	Description("markdown file server")
-
 	HTTP(func() {
 		Path("/api")
 	})
@@ -63,7 +68,7 @@ var _ = Service("imubackend", func() {
 	Method("listArticle", func() {
 		Description("list article")
 		Result(func() {
-			Attribute("ids", ArrayOf(String))
+			Attribute("list", ArrayOf(ArticleIdName))
 		})
 		HTTP(func() {
 			GET("/article/list")
@@ -73,20 +78,22 @@ var _ = Service("imubackend", func() {
 
 	Method("getArticle", func() {
 		Description("get article")
-		Payload(func() {
-			Attribute("id", String)
-		})
+		// Payload(func() {
+		// 	Attribute("id", String)
+		// })
+		Payload(String)
 		Result(func() {
 			Attribute("id", String)
 			Attribute("studentID", String)
 			Attribute("articleName", String)
 			Attribute("content", String)
 			Attribute("image", ArrayOf(File))
-			Attribute("createdAt", String)
-			Attribute("updatedAt", String)
+			Attribute("createdAt", Int64)
+			Attribute("updatedAt", Int64)
 		})
 		HTTP(func() {
-			GET("/article/get")
+			GET("/article/get/{id}")
+			Param("id", String)
 			Response(StatusOK)
 		})
 	})
@@ -101,6 +108,7 @@ var _ = Service("imubackend", func() {
 		})
 	})
 	Method("login", func() {
+		NoSecurity()
 		Description("IMU teacher and student login")
 		Payload(LoginAttribute)
 		Result(String)

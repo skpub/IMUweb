@@ -3,8 +3,10 @@
 package mocks
 
 import (
-	domain "IMUbackend/internal/entity"
+	db "IMUbackend/db"
 	context "context"
+
+	domain "IMUbackend/internal/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -77,23 +79,23 @@ func (_m *IArticleRepository) FindByID(ctx context.Context, id uuid.UUID) (*doma
 }
 
 // ListAll provides a mock function with given fields: ctx
-func (_m *IArticleRepository) ListAll(ctx context.Context) ([]uuid.UUID, error) {
+func (_m *IArticleRepository) ListAll(ctx context.Context) ([]db.ListMarkdownRow, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListAll")
 	}
 
-	var r0 []uuid.UUID
+	var r0 []db.ListMarkdownRow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]uuid.UUID, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]db.ListMarkdownRow, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []uuid.UUID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []db.ListMarkdownRow); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]uuid.UUID)
+			r0 = ret.Get(0).([]db.ListMarkdownRow)
 		}
 	}
 
