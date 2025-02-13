@@ -63,7 +63,6 @@
       const mimeType = element["name"].includes(".png") ? "image/png" : "image/jpeg"
       const binary = atob(element["content"])
       images[element["name"]] = arrayBufferToDataURL(binary, mimeType)
-      console.log(element["content"])
     });
     parsedArticle = await processMarkdown(article.content)
   }

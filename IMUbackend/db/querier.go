@@ -49,7 +49,7 @@ type Querier interface {
 	GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow, error)
 	ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error)
 	ListMarkdownID(ctx context.Context) ([]uuid.UUID, error)
-	Login(ctx context.Context, arg LoginParams) error
+	Login(ctx context.Context, arg LoginParams) (int64, error)
 	// img U
 	UpdateImg(ctx context.Context, arg UpdateImgParams) error
 	// markdown U

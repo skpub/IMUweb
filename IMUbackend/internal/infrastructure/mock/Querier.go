@@ -475,21 +475,31 @@ func (_m *Querier) ListMarkdownID(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // Login provides a mock function with given fields: ctx, arg
-func (_m *Querier) Login(ctx context.Context, arg db.LoginParams) error {
+func (_m *Querier) Login(ctx context.Context, arg db.LoginParams) (int64, error) {
 	ret := _m.Called(ctx, arg)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Login")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, db.LoginParams) error); ok {
+	var r0 int64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.LoginParams) (int64, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.LoginParams) int64); ok {
 		r0 = rf(ctx, arg)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(int64)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, db.LoginParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // UpdateImg provides a mock function with given fields: ctx, arg

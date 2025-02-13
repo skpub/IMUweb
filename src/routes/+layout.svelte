@@ -4,6 +4,7 @@
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
   import hamburger from '$lib/assets/hamburger.svg'
   import { onDestroy, onMount } from 'svelte';
+  import Notification from '$lib/Notification.svelte';
 
   let { children } = $props()
   // 0: dark
@@ -43,8 +44,8 @@
       link: 'president'
     },
     {
-      name: 'キャンパス',
-      link: 'campus'
+      name: 'アクセス',
+      link: 'access'
     },
     {
       name: '学部・大学院',
@@ -53,6 +54,10 @@
     {
       name: '入試情報',
       link: 'admission'
+    },
+    {
+      name: '学内ページ',
+      link: 'intra'
     }
   ]
 </script>
@@ -84,6 +89,7 @@
   {@render children()}
 </main>
 <div id="is-darkmode"></div>
+<Notification />
 
 <style>
   :global(body) {
@@ -98,6 +104,10 @@
     --white: #f5f5f5;
     --emphasis-dark: hsl(0, 100%, 78%);
     --emphasis-light: hsl(0, 100%, 30%);
+
+    --info: hsl(200, 100%, 40%);
+    --error: hsl(0, 80%, 40%);
+    --warning: hsl(30, 90%, 40%);
   }
   :global(a) {
     color: var(--immoral-text);
