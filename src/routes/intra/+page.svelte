@@ -5,7 +5,6 @@
   import { onMount } from "svelte";
 
   onMount(() => {
-    console.log($LoggedIn)
     if ($LoggedIn === undefined) {
       notify("学内ページにアクセスするためにはログインが必要です", "warning")
       goto("/login?redirect=/intra")

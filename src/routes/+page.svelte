@@ -3,7 +3,7 @@
   import imu_mc from '$lib/assets/IMU_minecraft.webp'
   import { onMount } from 'svelte';
   import type { PageProps } from './$types';
-    import { marked } from 'marked';
+  import { marked } from 'marked';
 
   type ArticleHead = {
     id: string

@@ -3,6 +3,7 @@ package service
 import (
 	"IMUbackend/db"
 	pb "IMUbackend/gen/imubackend"
+	"IMUbackend/internal/infrastructure"
 	"context"
 	"encoding/base64"
 	"time"
@@ -71,4 +72,24 @@ func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error 
 		Email:    *attribute.Email,
 	})
 	return err
+}
+
+func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload) (*pb.RefreshTokenResult, error) {
+	tokenStr := token.Token
+	_, studentID, err := infrastructure.JWTAuth(ctx, *tokenStr, s.jwtsecret)
+	if err != nil {
+		return nil, err
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims {
+		"student_id": studentID,
+		"exp": time.Now().Add(time.Minute * 5).Unix(),
+	})
+	refreshTokenStr, err := refreshToken.SignedString([]byte(s.jwtsecret))
+	if err != nil {
+		return nil, err
+	}
+	result := &pb.RefreshTokenResult{
+		Token: &refreshTokenStr,
+	}
+	return result, nil
 }

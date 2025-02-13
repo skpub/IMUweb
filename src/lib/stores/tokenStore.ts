@@ -15,6 +15,42 @@ export let LoggedIn = writable<UserInfo | undefined>(undefined)
 export class Login {
   private static timer: ReturnType<typeof setInterval> | undefined = undefined
 
+  private static async refresh() {
+    let newToken: string | undefined
+    let currentState: UserInfo | undefined
+
+    LoggedIn.update(v => {
+      currentState = v
+      return v
+    })
+
+    if (!currentState) {
+      throw new Error("current state is undefined.")
+    }
+
+    try {
+      const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ "token": currentState.token })
+      })
+
+      if (!res.ok) {
+        throw new Error("failed to refresh")
+      }
+
+      const data = await res.json()
+      newToken = data["token"]
+
+    } catch (e) {
+      // ネットワークがおかしいとき(など)はここに来る。
+      throw e
+    }
+    LoggedIn.set({ studentID: currentState.studentID, token: newToken! })
+  }
+
   private static async login_(studentname: string, password: string) {
     try {
       const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/login", {
@@ -26,7 +62,6 @@ export class Login {
       })
       if (!res.ok) {
         throw new Error("Failed to login")
-      } else {
       }
       const data = await res.json()
       const userinfo: UserInfo = {
@@ -35,7 +70,7 @@ export class Login {
       }
       LoggedIn.set(userinfo)
     } catch (e) {
-      // ネットワークガおかしいとき(など)はここに来る。
+      // ネットワークがおかしいとき(など)はここに来る。
       throw e
     } 
   }
@@ -47,7 +82,7 @@ export class Login {
     try {
       await Login.login_(studentName, password)
       Login.timer = setInterval(() => {
-        Login.login(studentName, password)
+        Login.refresh()
       }, (1000 * 60 * 4 + 1000 * 50)) // 5分でトークンが切れるので、4分50秒でリフレッシュ。
     } catch (e) {
       throw e;

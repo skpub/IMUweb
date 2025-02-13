@@ -107,6 +107,7 @@ var _ = Service("imubackend", func() {
 			Response(StatusOK)
 		})
 	})
+
 	Method("login", func() {
 		NoSecurity()
 		Description("IMU teacher and student login")
@@ -114,6 +115,20 @@ var _ = Service("imubackend", func() {
 		Result(String)
 		HTTP(func() {
 			POST("/login")
+			Response(StatusOK)
+		})
+	})
+
+	Method("refreshToken", func() {
+		Description("refresh token (each 5 minutes)")
+		Payload(func() {
+			Attribute("token", String)
+		})
+		Result(func() {
+			Attribute("token", String)
+		})
+		HTTP(func() {
+			POST("/refresh")
 			Response(StatusOK)
 		})
 	})
