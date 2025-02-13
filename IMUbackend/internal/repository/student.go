@@ -24,10 +24,17 @@ func NewStudentRepository(query db.Querier) IStudentRepository {
 }
 
 func (u *StudentRepository) Login(ctx context.Context, id string, password string) error {
-	return u.query.Login(ctx, db.LoginParams{
+	num, err := u.query.Login(ctx, db.LoginParams{
 		ID:       id,
 		Password: password,
 	})
+	if err != nil {
+		return err
+	}
+	if num == 0 {
+		return fmt.Errorf("auth error")
+	}
+	return nil
 	// return tx.Queries().Login(ctx, db.LoginParams{
 	// 	ID:       id,
 	// 	Password: password,

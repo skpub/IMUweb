@@ -8,7 +8,7 @@ INSERT INTO student (id, name, email, password) VALUES ($1, $2, $3, $4) RETURNIN
 SELECT * FROM student WHERE id = $1;
 -- name: FindStudentByEmail :one
 SELECT * FROM student WHERE email = $1;
--- name: Login :exec
+-- name: Login :one
 SELECT count(*) FROM student WHERE id = $1 AND password = $2;
 
 -- student U

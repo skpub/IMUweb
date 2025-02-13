@@ -385,7 +385,7 @@ func (q *Queries) ListMarkdownID(ctx context.Context) ([]uuid.UUID, error) {
 	return items, nil
 }
 
-const login = `-- name: Login :exec
+const login = `-- name: Login :one
 SELECT count(*) FROM student WHERE id = $1 AND password = $2
 `
 
@@ -394,9 +394,11 @@ type LoginParams struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) Login(ctx context.Context, arg LoginParams) error {
-	_, err := q.db.ExecContext(ctx, login, arg.ID, arg.Password)
-	return err
+func (q *Queries) Login(ctx context.Context, arg LoginParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, login, arg.ID, arg.Password)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const updateImg = `-- name: UpdateImg :exec

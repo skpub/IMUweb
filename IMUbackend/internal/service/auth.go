@@ -8,5 +8,6 @@ import (
 )
 
 func (s *IMUSrv) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
-	return infra.JWTAuth(ctx, token, s.jwtsecret)
+	newCtx, _, err := infra.JWTAuth(ctx, token, s.jwtsecret)
+	return newCtx, err
 }
