@@ -60,11 +60,13 @@
       content: data["content"]
     }
     article = article_
-    data["image"].forEach((element: Record<string, any>) => {
-      const mimeType = element["name"].includes(".png") ? "image/png" : "image/jpeg"
-      const binary = atob(element["content"])
-      images[element["name"]] = arrayBufferToDataURL(binary, mimeType)
-    });
+    if (data["image"] !== undefined) {
+      data["image"].forEach((element: Record<string, any>) => {
+        const mimeType = element["name"].includes(".png") ? "image/png" : "image/jpeg"
+        const binary = atob(element["content"])
+        images[element["name"]] = arrayBufferToDataURL(binary, mimeType)
+      });
+    }
     parsedArticle = await processMarkdown(article.content)
   }
 
