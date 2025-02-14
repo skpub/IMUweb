@@ -46,34 +46,6 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	return tokenString, nil
 }
 
-func (s *IMUSrv) CreateStudent(ctx context.Context, attribute *pb.Signup) error {
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if err != nil {
-			s.db.Rollback(tx)
-		} else {
-			s.db.Commit(tx)
-		}
-	}()
-
-	pwhashstr, err := genhash(*attribute.Password, s.salt)
-	if err != nil {
-		return err
-	}
-
-	err = s.user.Create(ctx, db.Student{
-		ID:       *attribute.StudentID,
-		Name:     *attribute.StudentName,
-		Password: pwhashstr,
-		Email:    *attribute.Email,
-	})
-	return err
-}
-
 func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload) (*pb.RefreshTokenResult, error) {
 	tokenStr := token.Token
 	_, studentID, err := infrastructure.JWTAuth(ctx, *tokenStr, s.jwtsecret)
@@ -92,4 +64,32 @@ func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload
 		Token: &refreshTokenStr,
 	}
 	return result, nil
+}
+
+func (s *IMUSrv) Signup(ctx context.Context, attribute *pb.SignupPayload) (string, error) {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if err != nil {
+			s.db.Rollback(tx)
+		} else {
+			s.db.Commit(tx)
+		}
+	}()
+
+	pwhashstr, err := genhash(*attribute.Password, s.salt)
+	if err != nil {
+		return "", err
+	}
+
+	id, err := s.user.Create(ctx, db.CreateStudentParams {
+		ID: 	 *attribute.StudentID,
+		Name:    *attribute.Name,
+		Email:   *attribute.Email,
+		Password: pwhashstr,
+	})
+	return id, err
 }

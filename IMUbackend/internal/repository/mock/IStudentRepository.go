@@ -15,21 +15,31 @@ type IStudentRepository struct {
 }
 
 // Create provides a mock function with given fields: ctx, user
-func (_m *IStudentRepository) Create(ctx context.Context, user db.Student) error {
+func (_m *IStudentRepository) Create(ctx context.Context, user db.CreateStudentParams) (string, error) {
 	ret := _m.Called(ctx, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, db.Student) error); ok {
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.CreateStudentParams) (string, error)); ok {
+		return rf(ctx, user)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.CreateStudentParams) string); ok {
 		r0 = rf(ctx, user)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(string)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, db.CreateStudentParams) error); ok {
+		r1 = rf(ctx, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Delete provides a mock function with given fields: ctx, id

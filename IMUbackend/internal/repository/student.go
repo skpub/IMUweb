@@ -8,7 +8,7 @@ import (
 )
 
 type IStudentRepository interface {
-	Create(ctx context.Context, user db.Student) error
+	Create(ctx context.Context, user db.CreateStudentParams) (string, error)
 	UpdateBio(ctx context.Context, id string, bio string) error
 	FindByID(ctx context.Context, id string) (db.Student, error)
 	Login(ctx context.Context, id string, password string) error
@@ -41,21 +41,16 @@ func (u *StudentRepository) Login(ctx context.Context, id string, password strin
 	// })
 }
 
-func (u *StudentRepository) Create(ctx context.Context, user db.Student) error {
+func (u *StudentRepository) Create(ctx context.Context, user db.CreateStudentParams) (string, error) {
 	_, err := u.query.FindStudentByID(ctx, user.ID)
 	if err != nil {
 		// err is not nil, but this means that the user does not exist
 		// so we can create the user
-		_, err := u.query.CreateStudent(ctx, db.CreateStudentParams{
-			ID:       user.ID,
-			Name:     user.Name,
-			Email:    user.Email,
-			Password: user.Password,
-		})
-		return err
+		id, err := u.query.CreateStudent(ctx, user)
+		return id, err
 	}
 	// Already exists, so return error
-	return fmt.Errorf("already exists")
+	return "", fmt.Errorf("already exists")
 }
 
 func (u *StudentRepository) UpdateBio(ctx context.Context, id string, bio string) error {
