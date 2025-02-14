@@ -33,13 +33,6 @@ var LoginAttribute = Type("Login", func() {
 	Attribute("password", String)
 })
 
-var SignupAttribute = Type("Signup", func() {
-	Attribute("student_id", String)
-	Attribute("password", String)
-	Attribute("studentName", String)
-	Attribute("email", String)
-})
-
 var _ = Service("imubackend", func() {
 	Description("markdown file server")
 	HTTP(func() {
@@ -99,14 +92,6 @@ var _ = Service("imubackend", func() {
 	})
 
 	// User CRUD
-	Method("createStudent", func() {
-		Description("create student")
-		Payload(SignupAttribute)
-		HTTP(func() {
-			POST("/student/create")
-			Response(StatusOK)
-		})
-	})
 
 	Method("login", func() {
 		NoSecurity()
@@ -114,7 +99,23 @@ var _ = Service("imubackend", func() {
 		Payload(LoginAttribute)
 		Result(String)
 		HTTP(func() {
-			POST("/login")
+			POST("/student/login")
+			Response(StatusOK)
+		})
+	})
+
+	Method("Signup", func() {
+		NoSecurity()
+		Description("Uraguchi Nyugaku")
+		Payload(func() {
+			Attribute("studentID", String)
+			Attribute("name", String)
+			Attribute("email", String)
+			Attribute("password", String)
+		})
+		Result(String)
+		HTTP(func() {
+			POST("/student/signup")
 			Response(StatusOK)
 		})
 	})

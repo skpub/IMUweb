@@ -5,6 +5,8 @@
   import hamburger from '$lib/assets/hamburger.svg'
   import { onDestroy, onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
+  import { LoggedIn } from '$lib/stores/tokenStore';
+    import { notify } from '$lib/notificationStore';
 
   let { children } = $props()
   // 0: dark
@@ -38,6 +40,17 @@
     observer.observe(theme_observer_DOM!)
   })
 
+  let studentContents = [
+    {
+      name: '記事作成',
+      link: 'cms'
+    },
+    {
+      name: '学内ページ',
+      link: 'intra'
+    }
+  ]
+
   let contents = [
     {
       name: '学長室',
@@ -58,32 +71,45 @@
     {
       name: '学内ページ',
       link: 'intra'
-    }
+    },
   ]
 </script>
 
 <svelte:window onclick={closeHamburger} />
 
 <header>
-    <div id="logo" class="clickable" onclick={() => {goto('/'); hamburger_active = false}}>
-      <img id="imu-logo" src={imu_logo} alt="IMU Logo" />
-      <div id="imu-text-logo" style='mask-image: url("{imu_text_logo}");'></div>
-    </div>
-    <div id="contents">
-      <div id="contents_list_pc">
+  <div id="logo" class="clickable" onclick={() => {goto('/'); hamburger_active = false}}>
+    <img id="imu-logo" src={imu_logo} alt="IMU Logo" />
+    <div id="imu-text-logo" style='mask-image: url("{imu_text_logo}");'></div>
+  </div>
+  <div id="contents">
+    <div id="contents_list_pc">
+      <div id="pub-contents">
         {#each contents as content} 
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
       </div>
-      <div id="contents_list_mobile">
-        <div id="hamburger" class="clickable" style='mask-image: url("{hamburger}");' onclick={() => hamburger_active = !hamburger_active}></div>
-        <nav class:active={hamburger_active}>
-          {#each contents as content} 
-            <a href={`/${content.link}`} onclick={() => hamburger_active = false}>{content.name}</a>
-          {/each}
-        </nav>
+      {#if $LoggedIn !== undefined}
+      <div id="student-contents">
+        {#each studentContents as content} 
+          <a href={`/${content.link}`}>{content.name}</a>
+        {/each}
+          <span onclick={() => {
+            LoggedIn.set(undefined)
+            notify('ログアウトしました', 'info')
+          }}>ログアウト</span>
       </div>
+      {/if}
     </div>
+    <div id="contents_list_mobile">
+      <div id="hamburger" class="clickable" style='mask-image: url("{hamburger}");' onclick={() => hamburger_active = !hamburger_active}></div>
+      <nav class:active={hamburger_active}>
+        {#each contents as content} 
+          <a href={`/${content.link}`} onclick={() => hamburger_active = false}>{content.name}</a>
+        {/each}
+      </nav>
+    </div>
+  </div>
 </header>
 <main>
   {@render children()}
@@ -181,7 +207,7 @@
     }
 
     #contents {
-      padding-left: 20px;
+      /* padding-left: 20px; */
       display: flex;
       align-items: center;
       height: 90px;
@@ -254,6 +280,23 @@
       background: var(--immoral-shadow);
       #contents_list_mobile {
         display: none;
+      }
+      #contents_list_pc {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+        #pub-contents {
+          padding-left: 20px;
+          flex: 1;
+          display: flex;
+          align-items: center;
+        }
+        #student-contents {
+          padding: 4px;
+          padding-left: 20px;
+          background-color: var(--immoral-shadow-darker);
+        }
       }
     }
   }

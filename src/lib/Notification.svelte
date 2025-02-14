@@ -27,6 +27,7 @@
     top: 95px;
     right: 10px;
     translate: transform(-100%);
+    pointer-events: none;
   }
   .notification {
     height: 40px;

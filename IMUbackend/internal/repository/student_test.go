@@ -18,7 +18,7 @@ func TestCreate(t *testing.T) {
 
 	t.Run("CreateStudent: Success", func(t *testing.T) {
 		id := "testuser"
-		student := db.Student {
+		student := db.CreateStudentParams {
 			ID: id,
 			Name: "test",
 			Email: "test@testmail.com",
@@ -26,13 +26,13 @@ func TestCreate(t *testing.T) {
 		}
 		qm.On("FindStudentByID", ctx, id).Return(db.Student{}, fmt.Errorf("not found"))
 		qm.On("CreateStudent", ctx, mocker.Anything).Return("user_id", nil)
-		err := studentRepo.Create(ctx, student)
+		_, err := studentRepo.Create(ctx, student)
 		assert.NoError(t, err)
 		qm.ExpectedCalls = nil
 	})
 	t.Run("CreateStudent: Fail (Already exists)", func(t *testing.T) {
 		id := "testuser"
-		student := db.Student {
+		student := db.CreateStudentParams {
 			ID: id,
 			Name: "test",
 			Email: "test@testmail.com",
@@ -40,7 +40,7 @@ func TestCreate(t *testing.T) {
 		}
 		qm.On("FindStudentByID", ctx, id).Return(db.Student{}, nil)
 		// CreateStudentは呼ばれないはず。
-		err := studentRepo.Create(ctx, student)
+		_, err := studentRepo.Create(ctx, student)
 		assert.Error(t, err)
 		qm.ExpectedCalls = nil
 	})

@@ -47,8 +47,8 @@ func TestStudent(t *testing.T) {
 		}).Return(nil)
 		db.On("BeginTx", ctx, (*sql.TxOptions)(nil)).Return(&sql.Tx{}, nil)
 		db.On("Commit", mock.Anything).Return(nil)
-		err := srv.CreateStudent(ctx, &pb.Signup{
-			StudentName: &userName,
+		_, err := srv.Signup(ctx, &pb.SignupPayload{
+			Name: &userName,
 			StudentID:   &userId,
 			Email:       &email,
 			Password:    &password,
@@ -66,8 +66,8 @@ func TestStudent(t *testing.T) {
 		}).Return(fmt.Errorf("クエリのどっかでエラー"))
 		db.On("BeginTx", ctx, (*sql.TxOptions)(nil)).Return(&sql.Tx{}, nil)
 		db.On("Rollback", mock.Anything).Return(nil)
-		err := srv.CreateStudent(ctx, &pb.Signup{
-			StudentName: &userName,
+		_, err := srv.Signup(ctx, &pb.SignupPayload {
+			Name: &userName,
 			StudentID:   &userId,
 			Email:       &email,
 			Password:    &password,

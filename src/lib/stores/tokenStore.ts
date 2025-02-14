@@ -53,7 +53,7 @@ export class Login {
 
   private static async login_(studentname: string, password: string) {
     try {
-      const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/login", {
+      const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/student/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

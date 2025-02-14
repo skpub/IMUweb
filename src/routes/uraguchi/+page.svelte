@@ -3,17 +3,35 @@
   import { notify } from "$lib/notificationStore";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
+    import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
 
   let redirect: string | null = page.url.searchParams.get('redirect')
   let student_id = '';
   let password = '';
+  let name = '';
+  let email = '';
   async function login() {
     try {
-      await Login.login(student_id, password)
-      notify("ログインに成功しました", "info")
-      goto(redirect ?? '/')
+      const res = await fetch(PUBLIC_BACKEND_ADDR + ':' + PUBLIC_BACKEND_PORT + '/api/student/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "studentID": student_id,
+          "password": password,
+          "name": name,
+          "email": email
+        })
+      })
+      if (res.status !== 200) {
+        notify("裏口入学に失敗しました", "error")
+        return
+      }
+      notify("裏口入学に成功しました", "info")
+      goto('/login')
     } catch (e) {
-      notify("ログインに失敗しました", "error")
+      notify("裏口入学に失敗しました(多分サーバが死んでる)", "error")
     }
   }
   function uraguchi() {
@@ -22,13 +40,14 @@
 </script>
 
 <div id="login_dialog">
-  <h1>認証</h1>
+  <h1>裏口入学</h1>
   <form onsubmit={login}>
     <input bind:value={student_id} type="text" name="username" placeholder="学生・教員ID" required>
+    <input bind:value={name} type="text" name="name" placeholder="名前" required>
+    <input bind:value={email} type="text" name="email" placeholder="E-Mail" required>
     <input bind:value={password} type="password" name="password" placeholder="パスワード" required>
-    <button type="submit">ログイン</button>
+    <button type="submit">違法登録</button>
   </form>
-  <button id="uraguchi" onclick={uraguchi}>裏口入学 (違法登録)</button>
 </div>
 
 <style>
@@ -61,9 +80,6 @@
         color: var(--white);
         background-color: var(--immoral-shadow);
       }
-    }
-    #uraguchi {
-      margin-top: 40px;
     }
   }
 </style>
