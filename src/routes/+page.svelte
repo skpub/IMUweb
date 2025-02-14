@@ -1,9 +1,9 @@
 <script lang="ts">
   import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from '$env/static/public'
   import imu_mc from '$lib/assets/IMU_minecraft.webp'
-  import { onMount } from 'svelte';
-  import type { PageProps } from './$types';
-  import { marked } from 'marked';
+  import { onMount } from 'svelte'
+  import type { PageProps } from './$types'
+  import { marked } from 'marked'
 
   type ArticleHead = {
     id: string
@@ -31,7 +31,7 @@
         updated: dateTime.toLocaleString()
       }
       list.push(article)
-    });
+    })
   }
 
   let images: Record<string, string> = $state({})

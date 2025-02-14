@@ -44,10 +44,6 @@
     {
       name: '記事作成',
       link: 'cms'
-    },
-    {
-      name: '学内ページ',
-      link: 'intra'
     }
   ]
 
