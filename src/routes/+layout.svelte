@@ -5,6 +5,7 @@
   import hamburger from '$lib/assets/hamburger.svg'
   import { onDestroy, onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
+  import { LoggedIn } from '$lib/stores/tokenStore';
 
   let { children } = $props()
   // 0: dark
@@ -38,7 +39,9 @@
     observer.observe(theme_observer_DOM!)
   })
 
-  let contents = [
+  let cmsLink = {name: '記事作成', link: 'cms'}
+
+  let contents = $derived([
     {
       name: '学長室',
       link: 'president'
@@ -58,8 +61,9 @@
     {
       name: '学内ページ',
       link: 'intra'
-    }
-  ]
+    },
+    ...($LoggedIn ? [cmsLink]: [])
+  ])
 </script>
 
 <svelte:window onclick={closeHamburger} />
