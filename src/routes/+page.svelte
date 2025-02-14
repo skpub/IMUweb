@@ -22,6 +22,7 @@
   })
   let list: ArticleHead[] = $state([])
   function get() {
+    if (data["list"]["list"] === undefined) return
     data["list"]["list"].forEach((element: ArticleHeadGot) => {
       let dateTime = new Date(Number(element["updated"]) * 1000)
       const article: ArticleHead = {
@@ -29,7 +30,7 @@
         name: element["name"],
         updated: dateTime.toLocaleString()
       }
-      list.unshift(article)
+      list.push(article)
     });
   }
 

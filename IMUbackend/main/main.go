@@ -32,8 +32,8 @@ func main() {
 		panic(fmt.Errorf("error loading .env file"))
 	}
 	var (
-		port    = os.Getenv("PUBLIC_BACKEND_PORT")
-		address = os.Getenv("PUBLIC_BACKEND_ADDR")
+		port    = os.Getenv("PRIVATE_BACKEND_PORT")
+		address = os.Getenv("PRIVATE_BACKEND_ADDR")
 	)
 	u, err := url.Parse(address + ":" + port)
 	if err != nil {

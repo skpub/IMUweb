@@ -6,7 +6,7 @@
   import { onDestroy, onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
   import { LoggedIn } from '$lib/stores/tokenStore';
-    import { notify } from '$lib/notificationStore';
+  import { notify } from '$lib/notificationStore';
 
   let { children } = $props()
   // 0: dark
