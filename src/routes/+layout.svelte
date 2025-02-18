@@ -5,7 +5,7 @@
   import hamburger from '$lib/assets/hamburger.svg'
   import { onDestroy, onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
-  import { LoggedIn } from '$lib/stores/tokenStore';
+  import { LoggedIn, loadCookie, unloadCookie } from '$lib/stores/tokenStore';
   import { notify } from '$lib/notificationStore';
 
   let { children } = $props()
@@ -31,6 +31,7 @@
   }
 
   onMount(() => {
+    loadCookie()
     const theme_observer_DOM = document.getElementById('is-darkmode')
 
     const observer = new IntersectionObserver(() => {
@@ -89,13 +90,16 @@
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
       </div>
-      {#if $LoggedIn !== undefined}
+      {#if $LoggedIn !== undefined }
       <div id="student-contents">
         {#each studentContents as content} 
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
           <span onclick={() => {
             LoggedIn.set(undefined)
+            console.log("削除前: " + document.cookie)
+            unloadCookie()
+            console.log("削除後:" + document.cookie)
             notify('ログアウトしました', 'info')
           }}>ログアウト</span>
       </div>

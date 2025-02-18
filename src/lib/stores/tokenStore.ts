@@ -1,5 +1,4 @@
 import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
-import { onDestroy } from "svelte";
 import { writable } from "svelte/store";
 
 type UserInfo = {
@@ -8,6 +7,40 @@ type UserInfo = {
 }
 
 export let LoggedIn = writable<UserInfo | undefined>(undefined)
+
+export const loadCookie = () => {
+  const cookie = getCookie()
+  if (cookie !== null) {
+    LoggedIn.set(cookie)
+  }
+}
+
+export const unloadCookie = () => {
+  document.cookie = "studentID=; max-age=0"
+  document.cookie = "token=; max-age=0"
+}
+
+type Cookie = {
+  studentID: string
+  token: string
+}
+
+function setCookie(studentID: string, token: string) {
+  const exp = Date.now() + 1000 * 60 * 5
+  document.cookie = `studentID=${studentID}; expires=${exp}`
+  document.cookie = `token=${token}; expires=${exp}`
+}
+
+function getCookie(): Cookie | null {
+  const cookie = document.cookie.split(';').map(c => c.trim())
+  const studentID = cookie.find(c => c.startsWith('studentID'))?.split('=')[1]
+  const token = cookie.find(c => c.startsWith('token'))?.split('=')[1]
+  if (studentID === undefined || token === undefined) {
+    return null
+  } else {
+    return { studentID: studentID, token: token }
+  }
+}
 
 //
 // static
@@ -49,6 +82,7 @@ export class Login {
       throw e
     }
     LoggedIn.set({ studentID: currentState.studentID, token: newToken! })
+    setCookie(currentState.studentID, newToken!)
   }
 
   private static async login_(studentname: string, password: string) {
@@ -69,6 +103,7 @@ export class Login {
         token: data
       }
       LoggedIn.set(userinfo)
+      setCookie(studentname, data)
     } catch (e) {
       // ネットワークがおかしいとき(など)はここに来る。
       throw e
