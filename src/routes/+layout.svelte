@@ -44,6 +44,10 @@
     {
       name: '記事作成',
       link: 'cms'
+    },
+    {
+      name: 'マイクラサーバ',
+      link: 'minecraft'
     }
   ]
 
