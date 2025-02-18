@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { LoggedIn, Login } from "$lib/stores/tokenStore";
+  // import { LoggedIn, Login } from "$lib/stores/tokenStore";
   import { notify } from "$lib/notificationStore";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-    import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
+  import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
 
   let redirect: string | null = page.url.searchParams.get('redirect')
   let student_id = '';

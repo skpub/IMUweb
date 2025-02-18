@@ -9,7 +9,7 @@
   let title = $state('')
   let editorStore = $state('# タイトル\n\n本文')
 
-  let token = $derived($LoggedIn?.token || "")
+  let token = $derived(LoggedIn?.token || "")
 
   function removeDefault(e: Event) {
     e.preventDefault()

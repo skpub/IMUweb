@@ -15,6 +15,6 @@
 
 <style>
   img {
-    width: 100%;
+    width: min(1000px, 100%);
   }
 </style>
