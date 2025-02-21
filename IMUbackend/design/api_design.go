@@ -17,6 +17,13 @@ var _ = API("imubackend", func() {
 	})
 })
 
+var StudentProfile = Type("StudentProfile", func() {
+	Attribute("studentID", String)
+	Attribute("name", String)
+	Attribute("bio", String)
+	Attribute("img", File)
+})
+
 var ArticleIdName = Type("ArticleIdName", func() {
 	Attribute("id", String)
 	Attribute("name", String)
@@ -92,7 +99,30 @@ var _ = Service("imubackend", func() {
 	})
 
 	// User CRUD
-
+	Method("getProfile", func() {
+		Security(JWTAuth)
+		Description("get student profile")
+		Result(StudentProfile)
+		Payload(func() {
+			TokenField(2, "token", String, func() {
+				Description("JWT token")
+			})
+			Required("token")
+		})
+		HTTP(func() {
+			GET("/student/profile")
+			Response(StatusOK)
+		})
+	})
+	Method("getProfiles", func() {
+		NoSecurity()
+		Description("get students profile")
+		Result(ArrayOf(StudentProfile))
+		HTTP(func() {
+			GET("/students/profile")
+			Response(StatusOK)
+		})
+	})
 	Method("login", func() {
 		NoSecurity()
 		Description("IMU teacher and student login")
@@ -121,15 +151,52 @@ var _ = Service("imubackend", func() {
 	})
 
 	Method("refreshToken", func() {
+		Security(JWTAuth)
 		Description("refresh token (each 5 minutes)")
 		Payload(func() {
 			Attribute("token", String)
+			TokenField(2, "token", String, func() {
+				Description("JWT token")
+			})
+			Required("token")
 		})
 		Result(func() {
 			Attribute("token", String)
 		})
 		HTTP(func() {
 			POST("/refresh")
+			Response(StatusOK)
+		})
+	})
+
+	Method("UpdateBio", func() {
+		Security(JWTAuth)
+		Description("update student bio")
+		Payload(func() {
+			Attribute("bio", String)
+			TokenField(2, "token", String, func() {
+				Description("JWT token")
+			})
+			Required("bio", "token")
+		})
+		HTTP(func() {
+			PUT("/student/bio")
+			Response(StatusOK)
+		})
+	})
+
+	Method("UpdateImg", func() {
+		Security(JWTAuth)
+		Description("update student img")
+		Payload(func() {
+			Attribute("img", File)
+			TokenField(2, "token", String, func() {
+				Description("JWT token")
+			})
+			Required("img", "token")
+		})
+		HTTP(func() {
+			PUT("/student/img")
 			Response(StatusOK)
 		})
 	})

@@ -4,7 +4,8 @@ CREATE TABLE student (
     bio         VARCHAR(510),
     since       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     email       VARCHAR(126) NOT NULL UNIQUE,
-    password    CHAR(60) NOT NULL
+    password    CHAR(60) NOT NULL,
+    img_path    UUID
 );
 
 CREATE TABLE img (

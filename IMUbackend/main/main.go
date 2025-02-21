@@ -82,7 +82,7 @@ func main() {
 		panic(err)
 	}
 	dbWrapper := dbb.New(db.GetDBTX())
-	userRepo := repository.NewStudentRepository(dbWrapper)
+	userRepo := repository.NewStudentRepository(dbWrapper, client, "student")
 	articleRepo := repository.NewArticleRepository(dbWrapper, client, "mds")
 	// end postgres
 

@@ -37,4 +37,5 @@ type Student struct {
 	Since    time.Time      `json:"since"`
 	Email    string         `json:"email"`
 	Password string         `json:"password"`
+	ImgPath  uuid.NullUUID  `json:"img_path"`
 }

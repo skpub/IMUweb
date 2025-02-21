@@ -46,6 +46,7 @@ type Querier interface {
 	FindStudentByEmail(ctx context.Context, email string) (Student, error)
 	// student R
 	FindStudentByID(ctx context.Context, id string) (Student, error)
+	FindStudents(ctx context.Context) ([]Student, error)
 	GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow, error)
 	ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error)
 	ListMarkdownID(ctx context.Context) ([]uuid.UUID, error)
@@ -55,6 +56,7 @@ type Querier interface {
 	// markdown U
 	UpdateMarkdown(ctx context.Context, arg UpdateMarkdownParams) error
 	UpdateStudentBio(ctx context.Context, arg UpdateStudentBioParams) error
+	UpdateStudentImg(ctx context.Context, id string) (uuid.NullUUID, error)
 	// student U
 	UpdateStudentName(ctx context.Context, arg UpdateStudentNameParams) error
 }
