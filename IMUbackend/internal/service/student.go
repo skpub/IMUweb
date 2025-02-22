@@ -100,6 +100,11 @@ func (s *IMUSrv) UpdateImg(ctx context.Context, attribute *pb.UpdateImgPayload) 
 	return s.user.UpdateImg(ctx, id, imgFile.Content)
 }
 
+func (s *IMUSrv) UpdateName(ctx context.Context, attribute *pb.UpdateNamePayload) error {
+	id := ctx.Value("studentId").(string)
+	return s.user.UpdateName(ctx, id, attribute.Name)
+}
+
 func (s *IMUSrv) GetProfile(ctx context.Context, _ *pb.GetProfilePayload) (*pb.StudentProfile, error) {
 	student, err := s.user.GetProfile(ctx)
 	if err != nil {

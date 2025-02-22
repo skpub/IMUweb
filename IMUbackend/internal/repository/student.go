@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -18,6 +19,7 @@ type IStudentRepository interface {
 	GetProfiles(ctx context.Context) ([]*StudentProfile, error)
 	UpdateBio(ctx context.Context, id string, bio string) error
 	UpdateImg(ctx context.Context, id string, img []byte) error
+	UpdateName(ctx context.Context, id string, name string) error
 	Login(ctx context.Context, id string, password string) error
 	Delete(ctx context.Context, id string) error
 }
@@ -60,6 +62,18 @@ func (u *StudentRepository) Create(ctx context.Context, user db.CreateStudentPar
 	}
 	// Already exists, so return error
 	return "", fmt.Errorf("already exists")
+}
+
+func (u *StudentRepository) UpdateName(ctx context.Context, id string, name string) error {
+	_, err := u.query.FindStudentByID(ctx, id)
+	if err != nil {
+		// Not found
+		return err
+	}
+	return u.query.UpdateStudentName(ctx, db.UpdateStudentNameParams{
+		ID:   id,
+		Name: name,
+	})
 }
 
 func (u *StudentRepository) UpdateBio(ctx context.Context, id string, bio string) error {
@@ -121,8 +135,7 @@ func (u *StudentRepository) GetProfile(ctx context.Context) (StudentProfile, err
 		if err != nil {
 			return StudentProfile{}, err
 		}
-		imgBytes := make([]byte, 0)
-		_, err = img.Read(imgBytes)
+		imgBytes, err := io.ReadAll(img)
 		if err != nil {
 			return StudentProfile{}, err
 		}
@@ -151,8 +164,7 @@ func (u *StudentRepository) GetProfiles(ctx context.Context) ([]*StudentProfile,
 			if err != nil {
 				return nil, err
 			}
-			imgBytes := make([]byte, 0)
-			_, err = img.Read(imgBytes)
+			imgBytes, err := io.ReadAll(img)
 			if err != nil {
 				return nil, err
 			}

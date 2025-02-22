@@ -138,6 +138,7 @@
     --immoral-light: hsl(0, 60%, 78%);
     --immoral-light-darker: hsl(0, 31%, 50%);
     --black: #2a2a2a;
+    --blackblack: #252525;
     --white: #f5f5f5;
     --emphasis-dark: hsl(0, 100%, 78%);
     --emphasis-light: hsl(0, 100%, 30%);

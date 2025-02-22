@@ -202,6 +202,24 @@ func (_m *IStudentRepository) UpdateImg(ctx context.Context, id string, img []by
 	return r0
 }
 
+// UpdateName provides a mock function with given fields: ctx, id, name
+func (_m *IStudentRepository) UpdateName(ctx context.Context, id string, name string) error {
+	ret := _m.Called(ctx, id, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateName")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, id, name)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewIStudentRepository creates a new instance of IStudentRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewIStudentRepository(t interface {

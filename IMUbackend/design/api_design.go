@@ -196,7 +196,24 @@ var _ = Service("imubackend", func() {
 			Required("img", "token")
 		})
 		HTTP(func() {
-			PUT("/student/img")
+			MultipartRequest()
+			PUT("/student/icon")
+			Response(StatusOK)
+		})
+	})
+
+	Method("UpdateName", func() {
+		Security(JWTAuth)
+		Description("update student name")
+		Payload(func() {
+			Attribute("name", String)
+			TokenField(2, "token", String, func() {
+				Description("JWT token")
+			})
+			Required("name", "token")
+		})
+		HTTP(func() {
+			PUT("/student/name")
 			Response(StatusOK)
 		})
 	})
