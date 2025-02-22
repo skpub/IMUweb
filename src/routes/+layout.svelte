@@ -7,8 +7,13 @@
   import Notification from '$lib/Notification.svelte';
   import { LoggedIn, Login, loadCookie, unloadCookie } from '$lib/stores/tokenStore';
   import { notify } from '$lib/notificationStore';
+  import { MetaTags, deepMerge } from 'svelte-meta-tags';
+  import { page } from '$app/state';
 
-  let { children } = $props()
+
+  let { data, children } = $props()
+
+  let metaTags = $derived(deepMerge(data.baseMetaTags, page.data.pageMetaTags))
   // 0: dark
   // 1: light
   let theme = $state(false)
@@ -84,6 +89,8 @@
     },
   ]
 </script>
+
+<MetaTags {...metaTags} />
 
 <svelte:window onclick={closeHamburger} />
 
