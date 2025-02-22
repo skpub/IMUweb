@@ -140,6 +140,7 @@
     --black: #2a2a2a;
     --blackblack: #252525;
     --white: #f5f5f5;
+    --whitewhite: #e9e9e9;
     --emphasis-dark: hsl(0, 100%, 78%);
     --emphasis-light: hsl(0, 100%, 30%);
 
@@ -169,6 +170,7 @@
   }
   :root.dark {
     --bg-color: var(--black);
+    --bg-bg-color: var(--blackblack);
     --text-color: var(--white);
     --immoral-text: var(--immoral-light);
     --key-color: var(--immoral-light);
@@ -176,6 +178,7 @@
   }
   :root.light {
     --bg-color: var(--white);
+    --bg-bg-color: var(--whitewhite);
     --text-color: var(--black);
     --immoral-text: var(--immoral-light-darker);
     --key-color: var(--immoral-shadow);
@@ -308,6 +311,9 @@
           padding: 4px;
           padding-left: 20px;
           background-color: var(--immoral-shadow-darker);
+          span {
+            color: var(--bg-color);
+          }
         }
       }
     }
