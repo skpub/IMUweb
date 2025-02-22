@@ -140,7 +140,7 @@
           font-size: 24px;
           width: 300px;
           border: none;
-          background-color: var(--blackblack);
+          background-color: var(--bg-bg-color);
           border-bottom: 3px solid var(--immoral-shadow);
         }
         textarea {
@@ -148,7 +148,7 @@
           margin: 0;
           border: none;
           border-bottom: 3px solid var(--immoral-shadow);
-          background-color: var(--blackblack);
+          background-color: var(--bg-bg-color);
           width: 300px;
           height: 200px;
         }
