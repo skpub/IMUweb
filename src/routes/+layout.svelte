@@ -312,7 +312,7 @@
           padding-left: 20px;
           background-color: var(--immoral-shadow-darker);
           span {
-            color: var(--bg-color);
+            color: var(--white);
           }
         }
       }
