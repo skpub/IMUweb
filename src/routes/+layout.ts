@@ -1,5 +1,7 @@
 import type { MetaTagsProps } from 'svelte-meta-tags'
-import imu from '$lib/assets/IMU_minecraft.webp'
+import { PUBLIC_BACKEND_ADDR } from '$env/static/public'
+
+const imu = `${PUBLIC_BACKEND_ADDR}/IMU_minecraft.webp`
 
 export const load = ({ url }) => {
   const baseMetaTags = Object.freeze({
@@ -7,6 +9,15 @@ export const load = ({ url }) => {
     titleTemplate: '%s | インモラル大学公式',
     description: 'インモラル大学の公式サイトです。',
     canonical: new URL(url.pathname, url.origin).href,
+    twitter: {
+      cardType: 'summary_large_image' as const,
+      site: '@OMGR_dearinsu',
+      creator: '@OMGR_dearinsu',
+      title: 'インモラル大学公式',
+      description: 'インモラル大学の公式サイトです',
+      image: imu,
+      imageAlt: 'インモラル大学のキャンパス'
+    },
     openGraph: {
       type: 'website',
       url: new URL(url.pathname, url.origin).href,
@@ -24,7 +35,7 @@ export const load = ({ url }) => {
           type: 'image/webp'
         }
       ]
-    }
+    },
   }) satisfies MetaTagsProps
 
   return {

@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
+  import imu from '$lib/assets/IMU_minecraft.webp'
   import hamburger from '$lib/assets/hamburger.svg'
   import { onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
