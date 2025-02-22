@@ -3,9 +3,9 @@
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
   import hamburger from '$lib/assets/hamburger.svg'
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
-  import { LoggedIn, loadCookie, unloadCookie } from '$lib/stores/tokenStore';
+  import { LoggedIn, Login, loadCookie, unloadCookie } from '$lib/stores/tokenStore';
   import { notify } from '$lib/notificationStore';
 
   let { children } = $props()
@@ -31,6 +31,7 @@
   }
 
   onMount(() => {
+    Login.restart_refresh()
     loadCookie()
     const theme_observer_DOM = document.getElementById('is-darkmode')
 
@@ -49,6 +50,10 @@
     {
       name: 'マイクラサーバ',
       link: 'minecraft'
+    },
+    {
+      name: 'プロフ編集',
+      link: 'profile'
     }
   ]
 
@@ -68,6 +73,10 @@
     {
       name: '入試情報',
       link: 'admission'
+    },
+    {
+      name: '学生一覧',
+      link: 'student'
     },
     {
       name: '学内ページ',
@@ -97,9 +106,7 @@
         {/each}
           <span onclick={() => {
             LoggedIn.set(undefined)
-            console.log("削除前: " + document.cookie)
             unloadCookie()
-            console.log("削除後:" + document.cookie)
             notify('ログアウトしました', 'info')
           }}>ログアウト</span>
       </div>
@@ -131,6 +138,7 @@
     --immoral-light: hsl(0, 60%, 78%);
     --immoral-light-darker: hsl(0, 31%, 50%);
     --black: #2a2a2a;
+    --blackblack: #252525;
     --white: #f5f5f5;
     --emphasis-dark: hsl(0, 100%, 78%);
     --emphasis-light: hsl(0, 100%, 30%);

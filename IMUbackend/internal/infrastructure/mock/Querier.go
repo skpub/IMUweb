@@ -384,6 +384,36 @@ func (_m *Querier) FindStudentByID(ctx context.Context, id string) (db.Student, 
 	return r0, r1
 }
 
+// FindStudents provides a mock function with given fields: ctx
+func (_m *Querier) FindStudents(ctx context.Context) ([]db.Student, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindStudents")
+	}
+
+	var r0 []db.Student
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]db.Student, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []db.Student); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Student)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetArticle provides a mock function with given fields: ctx, id
 func (_m *Querier) GetArticle(ctx context.Context, id uuid.UUID) ([]db.GetArticleRow, error) {
 	ret := _m.Called(ctx, id)
@@ -554,6 +584,34 @@ func (_m *Querier) UpdateStudentBio(ctx context.Context, arg db.UpdateStudentBio
 	}
 
 	return r0
+}
+
+// UpdateStudentImg provides a mock function with given fields: ctx, id
+func (_m *Querier) UpdateStudentImg(ctx context.Context, id string) (uuid.NullUUID, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateStudentImg")
+	}
+
+	var r0 uuid.NullUUID
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (uuid.NullUUID, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) uuid.NullUUID); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(uuid.NullUUID)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // UpdateStudentName provides a mock function with given fields: ctx, arg

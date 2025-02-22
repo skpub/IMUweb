@@ -3,7 +3,6 @@ package service
 import (
 	"IMUbackend/db"
 	pb "IMUbackend/gen/imubackend"
-	"IMUbackend/internal/infrastructure"
 	"context"
 	"encoding/base64"
 	"time"
@@ -35,9 +34,9 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	}
 
 	// create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"student_id": *attribute.StudentID,
-		"exp": time.Now().Add(time.Minute * 5).Unix(),
+		"exp":        time.Now().Add(time.Minute * 5).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(s.jwtsecret))
 	if err != nil {
@@ -47,14 +46,10 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 }
 
 func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload) (*pb.RefreshTokenResult, error) {
-	tokenStr := token.Token
-	_, studentID, err := infrastructure.JWTAuth(ctx, *tokenStr, s.jwtsecret)
-	if err != nil {
-		return nil, err
-	}
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims {
+	studentID := ctx.Value("studentId").(string)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"student_id": studentID,
-		"exp": time.Now().Add(time.Minute * 5).Unix(),
+		"exp":        time.Now().Add(time.Minute * 5).Unix(),
 	})
 	refreshTokenStr, err := refreshToken.SignedString([]byte(s.jwtsecret))
 	if err != nil {
@@ -85,11 +80,69 @@ func (s *IMUSrv) Signup(ctx context.Context, attribute *pb.SignupPayload) (strin
 		return "", err
 	}
 
-	id, err := s.user.Create(ctx, db.CreateStudentParams {
-		ID: 	 *attribute.StudentID,
-		Name:    *attribute.Name,
-		Email:   *attribute.Email,
+	id, err := s.user.Create(ctx, db.CreateStudentParams{
+		ID:       *attribute.StudentID,
+		Name:     *attribute.Name,
+		Email:    *attribute.Email,
 		Password: pwhashstr,
 	})
 	return id, err
+}
+
+func (s *IMUSrv) UpdateBio(ctx context.Context, attribute *pb.UpdateBioPayload) error {
+	id := ctx.Value("studentId").(string)
+	return s.user.UpdateBio(ctx, id, attribute.Bio)
+}
+
+func (s *IMUSrv) UpdateImg(ctx context.Context, attribute *pb.UpdateImgPayload) error {
+	id := ctx.Value("studentId").(string)
+	imgFile := attribute.Img
+	return s.user.UpdateImg(ctx, id, imgFile.Content)
+}
+
+func (s *IMUSrv) UpdateName(ctx context.Context, attribute *pb.UpdateNamePayload) error {
+	id := ctx.Value("studentId").(string)
+	return s.user.UpdateName(ctx, id, attribute.Name)
+}
+
+func (s *IMUSrv) GetProfile(ctx context.Context, _ *pb.GetProfilePayload) (*pb.StudentProfile, error) {
+	student, err := s.user.GetProfile(ctx)
+	if err != nil {
+		return nil, err
+	}
+	studentProfile := &pb.StudentProfile{
+		StudentID: student.StudentID,
+		Name:      student.Name,
+		Bio:       student.Bio,
+	}
+
+	if student.Img != nil {
+		studentProfile.Img = &pb.File{Content: *student.Img}
+	} else {
+		studentProfile.Img = nil
+	}
+
+	return studentProfile, nil
+}
+
+func (s *IMUSrv) GetProfiles(ctx context.Context) ([]*pb.StudentProfile, error) {
+	students, err := s.user.GetProfiles(ctx)
+	if err != nil {
+		return nil, err
+	}
+	profiles := make([]*pb.StudentProfile, 0)
+	for _, student := range students {
+		profile := &pb.StudentProfile{
+			StudentID: student.StudentID,
+			Name:      student.Name,
+			Bio:       student.Bio,
+		}
+		if student.Img != nil {
+			profile.Img = &pb.File{Content: *student.Img}
+		} else {
+			profile.Img = nil
+		}
+		profiles = append(profiles, profile)
+	}
+	return profiles, nil
 }

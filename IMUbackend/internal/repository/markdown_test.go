@@ -3,7 +3,6 @@ package repository
 import (
 	"IMUbackend/db"
 	entity "IMUbackend/internal/entity"
-	"IMUbackend/internal/infrastructure"
 	"context"
 	"fmt"
 	"strings"
@@ -19,7 +18,7 @@ import (
 
 func TestCreate_Success(t *testing.T) {
 	qm := new(mock.Querier)
-	minioClientMock := infrastructure.NewMinioMock()
+	minioClientMock := new(mock.MinioClient)
 
 	articleRepo := NewArticleRepository(qm, minioClientMock, "")
 

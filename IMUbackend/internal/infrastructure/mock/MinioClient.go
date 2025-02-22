@@ -75,6 +75,24 @@ func (_m *MinioClient) PutObject(ctx context.Context, bucketName string, objectN
 	return r0, r1
 }
 
+// RemoveObject provides a mock function with given fields: ctx, bucketName, objectName, opts
+func (_m *MinioClient) RemoveObject(ctx context.Context, bucketName string, objectName string, opts minio.RemoveObjectOptions) error {
+	ret := _m.Called(ctx, bucketName, objectName, opts)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RemoveObject")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, minio.RemoveObjectOptions) error); ok {
+		r0 = rf(ctx, bucketName, objectName, opts)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewMinioClient creates a new instance of MinioClient. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMinioClient(t interface {

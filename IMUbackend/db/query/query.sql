@@ -10,12 +10,16 @@ SELECT * FROM student WHERE id = $1;
 SELECT * FROM student WHERE email = $1;
 -- name: Login :one
 SELECT count(*) FROM student WHERE id = $1 AND password = $2;
+-- name: FindStudents :many
+SELECT * FROM student;
 
 -- student U
 -- name: UpdateStudentName :exec
 UPDATE student SET name = $2 WHERE id = $1;
 -- name: UpdateStudentBio :exec
 UPDATE student SET bio = $2 WHERE id = $1;
+-- name: UpdateStudentImg :one
+UPDATE student SET img_path = COALESCE(img_path, gen_random_uuid()) WHERE id = $1 RETURNING img_path;
 
 -- student D
 -- name: DeleteStudent :exec

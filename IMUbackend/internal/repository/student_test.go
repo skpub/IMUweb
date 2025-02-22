@@ -13,7 +13,8 @@ import (
 
 func TestCreate(t *testing.T) {
 	qm := new(mock.Querier)
-	studentRepo := NewStudentRepository(qm)
+	mm := new(mock.MinioClient)
+	studentRepo := NewStudentRepository(qm, mm, "bucket")
 	ctx := context.Background()
 
 	t.Run("CreateStudent: Success", func(t *testing.T) {

@@ -11,6 +11,7 @@ import (
 type MinioClient interface {
 	PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error)
 	GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*minio.Object, error)
+	RemoveObject(ctx context.Context, bucketName, objectName string, opts minio.RemoveObjectOptions) error
 }
 
 func NewObjectStorageConnection(endpoint string, accessKeyID string, secret string) (*minio.Client, error) {
@@ -21,18 +22,4 @@ func NewObjectStorageConnection(endpoint string, accessKeyID string, secret stri
 		return nil, err
 	}
 	return client, nil
-}
-
-type minioMock struct {}
-
-func NewMinioMock() MinioClient {
-	return &minioMock{}
-}
-
-func (m *minioMock) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error) {
-	return minio.UploadInfo{}, nil
-}
-
-func (m *minioMock) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*minio.Object, error) {
-	return nil, nil
 }

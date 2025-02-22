@@ -234,7 +234,7 @@ func (q *Queries) FindMarkdownImgRelByMarkdownID(ctx context.Context, markdownID
 }
 
 const findStudentByEmail = `-- name: FindStudentByEmail :one
-SELECT id, name, bio, since, email, password FROM student WHERE email = $1
+SELECT id, name, bio, since, email, password, img_path FROM student WHERE email = $1
 `
 
 func (q *Queries) FindStudentByEmail(ctx context.Context, email string) (Student, error) {
@@ -247,12 +247,13 @@ func (q *Queries) FindStudentByEmail(ctx context.Context, email string) (Student
 		&i.Since,
 		&i.Email,
 		&i.Password,
+		&i.ImgPath,
 	)
 	return i, err
 }
 
 const findStudentByID = `-- name: FindStudentByID :one
-SELECT id, name, bio, since, email, password FROM student WHERE id = $1
+SELECT id, name, bio, since, email, password, img_path FROM student WHERE id = $1
 `
 
 // student R
@@ -266,8 +267,44 @@ func (q *Queries) FindStudentByID(ctx context.Context, id string) (Student, erro
 		&i.Since,
 		&i.Email,
 		&i.Password,
+		&i.ImgPath,
 	)
 	return i, err
+}
+
+const findStudents = `-- name: FindStudents :many
+SELECT id, name, bio, since, email, password, img_path FROM student
+`
+
+func (q *Queries) FindStudents(ctx context.Context) ([]Student, error) {
+	rows, err := q.db.QueryContext(ctx, findStudents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Student
+	for rows.Next() {
+		var i Student
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Bio,
+			&i.Since,
+			&i.Email,
+			&i.Password,
+			&i.ImgPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getArticle = `-- name: GetArticle :many
@@ -443,6 +480,17 @@ type UpdateStudentBioParams struct {
 func (q *Queries) UpdateStudentBio(ctx context.Context, arg UpdateStudentBioParams) error {
 	_, err := q.db.ExecContext(ctx, updateStudentBio, arg.ID, arg.Bio)
 	return err
+}
+
+const updateStudentImg = `-- name: UpdateStudentImg :one
+UPDATE student SET img_path = COALESCE(img_path, gen_random_uuid()) WHERE id = $1 RETURNING img_path
+`
+
+func (q *Queries) UpdateStudentImg(ctx context.Context, id string) (uuid.NullUUID, error) {
+	row := q.db.QueryRowContext(ctx, updateStudentImg, id)
+	var img_path uuid.NullUUID
+	err := row.Scan(&img_path)
+	return img_path, err
 }
 
 const updateStudentName = `-- name: UpdateStudentName :exec

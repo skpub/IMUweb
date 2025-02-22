@@ -6,7 +6,11 @@ type UserInfo = {
   token: string
 }
 
-export let LoggedIn = writable<UserInfo | undefined>(undefined)
+export let LoggedIn = writable<UserInfo | undefined>()
+LoggedIn.subscribe(value => {
+  if (value !== undefined)
+  setCookie(value.studentID, value.token)
+})
 
 export const loadCookie = () => {
   const cookie = getCookie()
@@ -65,6 +69,7 @@ export class Login {
       const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/refresh", {
         method: "POST",
         headers: {
+          "Authorization": currentState.token,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ "token": currentState.token })
@@ -82,7 +87,6 @@ export class Login {
       throw e
     }
     LoggedIn.set({ studentID: currentState.studentID, token: newToken! })
-    setCookie(currentState.studentID, newToken!)
   }
 
   private static async login_(studentname: string, password: string) {
@@ -103,7 +107,6 @@ export class Login {
         token: data
       }
       LoggedIn.set(userinfo)
-      setCookie(studentname, data)
     } catch (e) {
       // ネットワークがおかしいとき(など)はここに来る。
       throw e
@@ -119,8 +122,21 @@ export class Login {
       Login.timer = setInterval(() => {
         Login.refresh()
       }, (1000 * 60 * 4 + 1000 * 50)) // 5分でトークンが切れるので、4分50秒でリフレッシュ。
+      // }, (10 * 60 * 4 + 10 * 50)) // 5 / 100 分でトークンが切れるので、4分50秒でリフレッシュ。
     } catch (e) {
       throw e;
+    }
+  }
+
+  public static async restart_refresh() {
+    const cookie = getCookie()
+    if (cookie != null) {
+      Login.destroy()
+      this.refresh()
+      Login.timer = setInterval(() => {
+        Login.refresh()
+      }, (1000 * 60 * 4 + 1000 * 50)) // 5分でトークンが切れるので、4分50秒でリフレッシュ。
+      // }, (10 * 60 * 4 + 10 * 50)) // 5 / 100 分でトークンが切れるので、4分50秒でリフレッシュ。
     }
   }
 

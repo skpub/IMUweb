@@ -29,7 +29,8 @@ services:
 
       mc alias set mdstore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
 
-      mc mb ${MDFILESYSTEM}/${MDBUCKET};
+      mc mb ${MDFILESYSTEM}/md;
+      mc mb ${MDFILESYSTEM}/student;
       "
 
     volumes:
