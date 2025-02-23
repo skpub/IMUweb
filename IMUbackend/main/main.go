@@ -14,6 +14,7 @@ import (
 	dbb "IMUbackend/db"
 
 	infrastructure "IMUbackend/internal/infrastructure"
+	"IMUbackend/internal/infrastructure/middleware"
 	"IMUbackend/internal/repository"
 	service "IMUbackend/internal/service"
 	"fmt"
@@ -100,9 +101,11 @@ func main() {
 
 	var (
 		imubackendEndpoints *imubackend.Endpoints
+		interceptor 	   	*middleware.Interceptor
 	)
 	{
-		imubackendEndpoints = imubackend.NewEndpoints(imubackendSvc)
+		interceptor = middleware.NewInterceptor(jwtSecret)
+		imubackendEndpoints = imubackend.NewEndpoints(imubackendSvc, interceptor)
 		imubackendEndpoints.Use(debug.LogPayloads())
 		imubackendEndpoints.Use(log.Endpoint)
 	}
