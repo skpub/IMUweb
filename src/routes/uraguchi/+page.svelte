@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import { LoggedIn, Login } from "$lib/stores/tokenStore";
   import { notify } from "$lib/notificationStore";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";

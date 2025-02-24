@@ -36,7 +36,7 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	// create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"student_id": *attribute.StudentID,
-		"exp":        time.Now().Add(time.Minute * 5).Unix(),
+		"exp":        time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(s.jwtsecret))
 	if err != nil {
@@ -45,11 +45,15 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	return tokenString, nil
 }
 
+func (s *IMUSrv) Logout(ctx context.Context) (string, error) {
+	return "", nil
+}
+
 func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload) (*pb.RefreshTokenResult, error) {
 	studentID := ctx.Value("studentId").(string)
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"student_id": studentID,
-		"exp":        time.Now().Add(time.Minute * 5).Unix(),
+		"exp":        time.Now().Add(time.Hour * 24).Unix(),
 	})
 	refreshTokenStr, err := refreshToken.SignedString([]byte(s.jwtsecret))
 	if err != nil {

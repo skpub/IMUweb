@@ -4,8 +4,16 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var JWTAuth = JWTSecurity("jwt", func() {
-	Description("Secures student only endpoints")
+// var JWTAuth = JWTServerInterceptor("jwt", func() {
+// 	Description("Secures student only endpoints")
+// })
+
+var JWTAuth = Interceptor("JWTAuth", func() {
+	Description("Serverside validation")
+
+	ReadPayload(func() {
+		Attribute("token", String)
+	})
 })
 
 var _ = API("imubackend", func() {
@@ -36,7 +44,7 @@ var File = Type("file", func() {
 })
 
 var LoginAttribute = Type("Login", func() {
-	Attribute("studentId", String)
+	Attribute("studentID", String)
 	Attribute("password", String)
 })
 
@@ -47,18 +55,17 @@ var _ = Service("imubackend", func() {
 	})
 
 	Method("createArticle", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("create markdown file")
 		Payload(func() {
 			Attribute("articleName", String)
 			Attribute("content", String)
 			Attribute("image", ArrayOf(File))
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
+			Attribute("token", String)
 			Required("articleName", "content", "token")
 		})
 		HTTP(func() {
+			Cookie("token")
 			MultipartRequest()
 			POST("/article/create")
 			Response(StatusOK)
@@ -100,22 +107,21 @@ var _ = Service("imubackend", func() {
 
 	// User CRUD
 	Method("getProfile", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("get student profile")
 		Result(StudentProfile)
 		Payload(func() {
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
+			Attribute("token", String)
 			Required("token")
 		})
 		HTTP(func() {
 			GET("/student/profile")
+			Cookie("token")
 			Response(StatusOK)
 		})
 	})
 	Method("getProfiles", func() {
-		NoSecurity()
+		
 		Description("get students profile")
 		Result(ArrayOf(StudentProfile))
 		HTTP(func() {
@@ -124,18 +130,38 @@ var _ = Service("imubackend", func() {
 		})
 	})
 	Method("login", func() {
-		NoSecurity()
 		Description("IMU teacher and student login")
 		Payload(LoginAttribute)
 		Result(String)
 		HTTP(func() {
 			POST("/student/login")
-			Response(StatusOK)
+			Response(StatusOK, func() {
+				Cookie("token")
+				CookieMaxAge(60 * 60 * 24)
+				CookiePath("/")
+				CookieHTTPOnly()
+				CookieSecure()
+				CookieSameSite(CookieSameSiteStrict)
+			})
+		})
+	})
+	Method("logout", func() {
+		Description("logout")
+		Result(String)
+		HTTP(func() {
+			GET("/student/logout")
+			Response(StatusOK, func() {
+				Cookie("token")
+				CookieMaxAge(0)
+				CookiePath("/")
+				CookieHTTPOnly()
+				CookieSecure()
+				CookieSameSite(CookieSameSiteStrict)
+			})
 		})
 	})
 
 	Method("Signup", func() {
-		NoSecurity()
 		Description("Uraguchi Nyugaku")
 		Payload(func() {
 			Attribute("studentID", String)
@@ -151,13 +177,10 @@ var _ = Service("imubackend", func() {
 	})
 
 	Method("refreshToken", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("refresh token (each 5 minutes)")
 		Payload(func() {
 			Attribute("token", String)
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
 			Required("token")
 		})
 		Result(func() {
@@ -165,55 +188,57 @@ var _ = Service("imubackend", func() {
 		})
 		HTTP(func() {
 			POST("/refresh")
-			Response(StatusOK)
+			Cookie("token")
+			Response(StatusOK, func() {
+				Cookie("token")
+				CookieMaxAge(60 * 60 * 24)
+				CookiePath("/")
+			})
 		})
 	})
 
 	Method("UpdateBio", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("update student bio")
 		Payload(func() {
 			Attribute("bio", String)
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
+			Attribute("token", String)
 			Required("bio", "token")
 		})
 		HTTP(func() {
 			PUT("/student/bio")
+			Cookie("token")
 			Response(StatusOK)
 		})
 	})
 
 	Method("UpdateImg", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("update student img")
 		Payload(func() {
 			Attribute("img", File)
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
+			Attribute("token", String)
 			Required("img", "token")
 		})
 		HTTP(func() {
 			MultipartRequest()
 			PUT("/student/icon")
+			Cookie("token")
 			Response(StatusOK)
 		})
 	})
 
 	Method("UpdateName", func() {
-		Security(JWTAuth)
+		ServerInterceptor(JWTAuth)
 		Description("update student name")
 		Payload(func() {
 			Attribute("name", String)
-			TokenField(2, "token", String, func() {
-				Description("JWT token")
-			})
+			Attribute("token", String)
 			Required("name", "token")
 		})
 		HTTP(func() {
 			PUT("/student/name")
+			Cookie("token")
 			Response(StatusOK)
 		})
 	})
