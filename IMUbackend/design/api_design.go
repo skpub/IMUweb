@@ -44,7 +44,7 @@ var File = Type("file", func() {
 })
 
 var LoginAttribute = Type("Login", func() {
-	Attribute("studentId", String)
+	Attribute("studentID", String)
 	Attribute("password", String)
 })
 
@@ -137,7 +137,7 @@ var _ = Service("imubackend", func() {
 			POST("/student/login")
 			Response(StatusOK, func() {
 				Cookie("token")
-				CookieMaxAge(5 * 60)
+				CookieMaxAge(60 * 60 * 24)
 				CookiePath("/")
 			})
 		})
@@ -173,7 +173,7 @@ var _ = Service("imubackend", func() {
 			Cookie("token")
 			Response(StatusOK, func() {
 				Cookie("token")
-				CookieMaxAge(5 * 60)
+				CookieMaxAge(60 * 60 * 24)
 				CookiePath("/")
 			})
 		})

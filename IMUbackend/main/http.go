@@ -28,6 +28,17 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// 2025年2月24日 海音
+// DIRTY!!
+// ResponseWriter is used to store the token to the Cookie.
+// Shouldn't be used to other purposes.
+func ResponseWriterCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "responseWriter", w)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
 func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imubackend.Endpoints, wg *sync.WaitGroup, errc chan error, dbg bool) {
@@ -71,6 +82,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imub
 
 	var handler http.Handler = mux
 	handler = corsMiddleware(handler)
+	handler = ResponseWriterCtx(handler)
 	if dbg {
 		// Log query and response bodies if debug logs are enabled.
 		handler = debug.HTTP()(handler)

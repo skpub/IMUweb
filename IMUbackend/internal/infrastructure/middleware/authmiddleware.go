@@ -4,6 +4,8 @@ import (
 	interceptors "IMUbackend/gen/imubackend"
 	"IMUbackend/internal/infrastructure"
 	"context"
+	"net/http"
+	"time"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -20,9 +22,19 @@ func NewInterceptor(jwtsecret string) *Interceptor {
 
 func (i *Interceptor) JWTAuth(ctx context.Context, info *interceptors.JWTAuthInfo, next goa.Endpoint) (any, error) {
 	token := info.Payload().Token()
-	newCtx, _, err := infrastructure.JWTAuth(ctx, token, i.jwtsecret)
+	newCtx, newToken, err := infrastructure.JWTAuth(ctx, token, i.jwtsecret)
 	if err != nil {
 		return nil, err
+	}
+	if newToken != "" {
+		writer := newCtx.Value("responseWriter").(http.ResponseWriter)
+		tokenCookie := http.Cookie{
+			Name: "token",
+			Value: newToken,
+			MaxAge: int(time.Hour * 24),
+			Path: "/",
+		}
+		http.SetCookie(writer, &tokenCookie)
 	}
 	return next(newCtx, info.RawPayload())
 }
