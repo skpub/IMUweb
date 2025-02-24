@@ -19,6 +19,7 @@
       <span>{data.BEAddr}</span>
     </div>
   </div>
+  <p>ホワイトリスト制なので学長にXのDM(<a href="https://x.com/OMGR_dearinsu">@OMGR_dearinsu</a>)なり何なりでIDを送ってください(BEの場合はインタラクティブなやり取りが必要です)</p>
 </div>
 
 <style>
@@ -28,5 +29,8 @@
   }
   .mctable span:nth-child(odd) {
     width: 180px;
+  }
+  p span {
+    color: var(--emphasis)
   }
 </style>
