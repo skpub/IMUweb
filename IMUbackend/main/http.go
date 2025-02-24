@@ -15,17 +15,20 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
+func corsMiddleware(allowOrigin string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // 2025年2月24日 海音
@@ -41,7 +44,14 @@ func ResponseWriterCtx(next http.Handler) http.Handler {
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imubackend.Endpoints, wg *sync.WaitGroup, errc chan error, dbg bool) {
+func handleHTTPServer(
+	ctx context.Context,
+	u *url.URL,
+	allowOrigin string,
+	imubackendEndpoints *imubackend.Endpoints,
+	wg *sync.WaitGroup,
+	errc chan error,
+	dbg bool){
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -81,7 +91,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, imubackendEndpoints *imub
 	imubackendsvr.Mount(mux, imubackendServer)
 
 	var handler http.Handler = mux
-	handler = corsMiddleware(handler)
+	handler = corsMiddleware(allowOrigin)(handler)
 	handler = ResponseWriterCtx(handler)
 	if dbg {
 		// Log query and response bodies if debug logs are enabled.

@@ -101,7 +101,7 @@ func main() {
 
 	var (
 		imubackendEndpoints *imubackend.Endpoints
-		interceptor 	   	*middleware.Interceptor
+		interceptor         *middleware.Interceptor
 	)
 	{
 		interceptor = middleware.NewInterceptor(jwtSecret)
@@ -121,7 +121,8 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(ctx)
 
-	handleHTTPServer(ctx, u, imubackendEndpoints, &wg, errc, *dbgF)
+	frontendOrigin := os.Getenv("PUBLIC_FRONTEND_ORIGIN")
+	handleHTTPServer(ctx, u, frontendOrigin , imubackendEndpoints, &wg, errc, *dbgF)
 
 	log.Printf(ctx, "exiting (%v)", <-errc)
 

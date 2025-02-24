@@ -2,14 +2,11 @@
   import { goto } from "$app/navigation";
   import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
   import { notify } from "$lib/notificationStore";
-  import { LoggedIn } from "$lib/stores/tokenStore";
   import { marked } from "marked";
 
   let images = $state<Record<string,File>>({})
   let title = $state('')
   let editorStore = $state('# タイトル\n\n本文')
-
-  let token = $derived(LoggedIn?.token || "")
 
   function removeDefault(e: Event) {
     e.preventDefault()
@@ -51,9 +48,6 @@
     try {
       let res = await fetch(PUBLIC_BACKEND_ADDR + ':' + PUBLIC_BACKEND_PORT + '/api/article/create', {
         method: 'POST',
-        headers: {
-          'Authorization': token
-        },
         body: fd,
       })
       if (res.ok) {

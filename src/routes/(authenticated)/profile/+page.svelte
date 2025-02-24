@@ -1,7 +1,7 @@
 <script lang="ts">
   import def_icon from '$lib/assets/def_user_icon.svg'
   import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from '$env/static/public';
-  import { LoggedIn } from '$lib/stores/tokenStore';
+  import { LoggedIn } from '$lib/stores/session';
   import { notify } from '$lib/notificationStore';
 
   let bio = $state('')
@@ -11,12 +11,9 @@
   let file = $state<File | null>(null)
 
   $effect(() => {
-    if ($LoggedIn === undefined) return
+    if ($LoggedIn === false) return
     fetch(`${PUBLIC_BACKEND_ADDR}:${PUBLIC_BACKEND_PORT}/api/student/profile`, {
       method: 'GET',
-      headers: {
-        'Authorization': $LoggedIn.token
-      }
     })
       .then((res) => res.json())
       .then((data: any) => {
@@ -36,7 +33,6 @@
     fetch(`${PUBLIC_BACKEND_ADDR}:${PUBLIC_BACKEND_PORT}/api/student/name`, {
       method: 'PUT',
       headers: {
-        'Authorization': $LoggedIn!.token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -49,7 +45,6 @@
     fetch(`${PUBLIC_BACKEND_ADDR}:${PUBLIC_BACKEND_PORT}/api/student/bio`, {
       method: 'PUT',
       headers: {
-        'Authorization' : $LoggedIn!.token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -68,9 +63,6 @@
 
     fetch(`${PUBLIC_BACKEND_ADDR}:${PUBLIC_BACKEND_PORT}/api/student/icon`, {
       method: 'PUT',
-      headers: {
-        'Authorization': $LoggedIn!.token,
-      },
       body: fd
     })
     .then(async (res) => {

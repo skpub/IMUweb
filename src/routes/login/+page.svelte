@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LoggedIn, Login } from "$lib/stores/tokenStore";
+  import { login, LoggedIn } from "$lib/stores/session";
   import { notify } from "$lib/notificationStore";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
@@ -7,10 +7,11 @@
   let redirect: string | null = page.url.searchParams.get('redirect')
   let student_id = '';
   let password = '';
-  async function login() {
+  async function login_() {
     try {
-      await Login.login(student_id, password)
+      await login(student_id, password)
       notify("ログインに成功しました", "info")
+      LoggedIn.set(true)
       goto(redirect ?? '/')
     } catch (e) {
       notify("ログインに失敗しました", "error")
@@ -23,7 +24,7 @@
 
 <div id="login_dialog">
   <h1>認証</h1>
-  <form onsubmit={login}>
+  <form onsubmit={login_}>
     <input bind:value={student_id} type="text" name="username" placeholder="学生・教員ID" required>
     <input bind:value={password} type="password" name="password" placeholder="パスワード" required>
     <button type="submit">ログイン</button>

@@ -2,11 +2,10 @@
   import { goto } from '$app/navigation';
   import imu_logo from '$lib/assets/IMU_logo.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
-  import imu from '$lib/assets/IMU_minecraft.webp'
   import hamburger from '$lib/assets/hamburger.svg'
   import { onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
-  import { LoggedIn, Login, loadCookie, unloadCookie } from '$lib/stores/tokenStore';
+  import { LoggedIn, reload } from '$lib/stores/session';
   import { notify } from '$lib/notificationStore';
   import { MetaTags, deepMerge } from 'svelte-meta-tags';
   import { page } from '$app/state';
@@ -36,9 +35,12 @@
     }
   }
 
-  onMount(() => {
-    Login.restart_refresh()
-    loadCookie()
+  onMount(async () => {
+    try {
+      await reload()
+    } catch (e) {
+      console.log(e)
+    }
     const theme_observer_DOM = document.getElementById('is-darkmode')
 
     const observer = new IntersectionObserver(() => {
@@ -107,14 +109,13 @@
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
       </div>
-      {#if $LoggedIn !== undefined }
+      {#if $LoggedIn !== false }
       <div id="student-contents">
         {#each studentContents as content} 
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
           <span onclick={() => {
-            LoggedIn.set(undefined)
-            unloadCookie()
+            LoggedIn.set(false)
             notify('ログアウトしました', 'info')
           }}>ログアウト</span>
       </div>

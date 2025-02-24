@@ -31,6 +31,9 @@ func (i *Interceptor) JWTAuth(ctx context.Context, info *interceptors.JWTAuthInf
 		tokenCookie := http.Cookie{
 			Name: "token",
 			Value: newToken,
+			HttpOnly: true,
+			Secure: true,
+			SameSite: http.SameSiteStrictMode,
 			MaxAge: int(time.Hour * 24),
 			Path: "/",
 		}
