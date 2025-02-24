@@ -30,7 +30,7 @@
         name: element["name"],
         updated: dateTime.toLocaleString()
       }
-      list.push(article)
+      list.unshift(article)
     })
   }
 
