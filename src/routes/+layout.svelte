@@ -5,7 +5,7 @@
   import hamburger from '$lib/assets/hamburger.svg'
   import { onMount } from 'svelte';
   import Notification from '$lib/Notification.svelte';
-  import { LoggedIn, reload } from '$lib/stores/session';
+  import { LoggedIn, logout, reload } from '$lib/stores/session';
   import { notify } from '$lib/notificationStore';
   import { MetaTags, deepMerge } from 'svelte-meta-tags';
   import { page } from '$app/state';
@@ -65,7 +65,7 @@
     }
   ]
 
-  let contents = [
+  let contents = $derived([
     {
       name: '学長室',
       link: 'president'
@@ -86,11 +86,12 @@
       name: '学生一覧',
       link: 'student'
     },
+    $LoggedIn === true ? {}: 
     {
-      name: '学内ページ',
-      link: 'intra'
+      name: 'ログイン',
+      link: 'login'
     },
-  ]
+  ])
 </script>
 
 <MetaTags {...metaTags} />
@@ -109,13 +110,13 @@
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
       </div>
-      {#if $LoggedIn !== false }
+      {#if $LoggedIn === true }
       <div id="student-contents">
         {#each studentContents as content} 
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
           <span onclick={() => {
-            LoggedIn.set(false)
+            logout()
             notify('ログアウトしました', 'info')
           }}>ログアウト</span>
       </div>

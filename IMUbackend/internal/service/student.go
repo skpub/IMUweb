@@ -45,6 +45,10 @@ func (s *IMUSrv) Login(ctx context.Context, attribute *pb.Login2) (string, error
 	return tokenString, nil
 }
 
+func (s *IMUSrv) Logout(ctx context.Context) (string, error) {
+	return "", nil
+}
+
 func (s *IMUSrv) RefreshToken(ctx context.Context, token *pb.RefreshTokenPayload) (*pb.RefreshTokenResult, error) {
 	studentID := ctx.Value("studentId").(string)
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

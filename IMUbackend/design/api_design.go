@@ -141,7 +141,22 @@ var _ = Service("imubackend", func() {
 				CookiePath("/")
 				CookieHTTPOnly()
 				CookieSecure()
-				CookieSameSite(CookieSameSiteNone)
+				CookieSameSite(CookieSameSiteStrict)
+			})
+		})
+	})
+	Method("logout", func() {
+		Description("logout")
+		Result(String)
+		HTTP(func() {
+			GET("/student/logout")
+			Response(StatusOK, func() {
+				Cookie("token")
+				CookieMaxAge(0)
+				CookiePath("/")
+				CookieHTTPOnly()
+				CookieSecure()
+				CookieSameSite(CookieSameSiteStrict)
 			})
 		})
 	})

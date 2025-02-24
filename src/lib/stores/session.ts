@@ -1,7 +1,7 @@
 import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from "$env/static/public";
 import { writable } from "svelte/store";
 
-export let LoggedIn = writable<boolean>(false)
+export let LoggedIn = writable<boolean | undefined>(undefined)
 
 export async function reload() {
   try {
@@ -12,10 +12,7 @@ export async function reload() {
       },
       credentials: "include"
     })
-    if (!res.ok) {
-      console.log(res)
-      throw new Error("Failed to refresh session.")
-    }
+    if (!res.ok) throw new Error("Failed to refresh session.")
     LoggedIn.set(true)
   } catch (e) {
     throw e
@@ -35,6 +32,23 @@ export async function login(studentID: string, password: string) {
       })
     })
     if (!res.ok) throw new Error("Login failed.")
+    LoggedIn.set(true)
+  } catch (e) {
+    throw e
+  }
+}
+
+export async function logout() {
+  try {
+    const res = await fetch(PUBLIC_BACKEND_ADDR + ":" + PUBLIC_BACKEND_PORT + "/api/student/logout", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include"
+    })
+    if (!res.ok) throw new Error("Logout failed.")
+    LoggedIn.set(false)
   } catch (e) {
     throw e
   }

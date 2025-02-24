@@ -26,7 +26,7 @@ func JWTAuth(ctx context.Context, tokenString string, secret string) (context.Co
 		if exp < time.Now().Unix() {
 			return nil, "", fmt.Errorf("token is expired")
 
-		} else if exp - time.Now().Unix() < 60 * 60 * 24 {
+		} else if exp - time.Now().Unix() < 60 * 60 * 12 {
 			// refresh token
 			student_id := claims["student_id"].(string)
 			newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
