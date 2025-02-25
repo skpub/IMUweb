@@ -3,6 +3,7 @@
   import { PUBLIC_BACKEND_ADDR, PUBLIC_BACKEND_PORT } from '$env/static/public';
   import { LoggedIn } from '$lib/stores/session';
   import { notify } from '$lib/notificationStore';
+  import { makeBlobURL } from '$lib/imgblob';
 
   let bio = $state('')
   let name = $state('')
@@ -19,13 +20,8 @@
       .then((data: any) => {
         name = data.name
         bio = data.bio
-        const binary = atob(data.img.content)
-        const buffer = new Uint8Array(binary.length)
-        for (let i = 0; i < binary.length; i++) {
-          buffer[i] = binary.charCodeAt(i)
-        }
-        const blob = new Blob([buffer], { type: "image/jpeg" })
-        icon = URL.createObjectURL(blob)
+        if (!data.img) return
+        icon = makeBlobURL(data.img.content)
       })
   })
 
