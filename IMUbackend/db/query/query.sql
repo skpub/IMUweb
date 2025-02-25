@@ -39,7 +39,9 @@ SELECT * FROM markdown WHERE id = $1;
 -- name: ListMarkdownID :many
 SELECT id FROM markdown;
 -- name: ListMarkdown :many
-SELECT id, title, updated FROM markdown;
+SELECT m.id, m.title, m.student_id, s.name, m.updated
+FROM markdown m
+JOIN student s ON m.student_id = s.id;
 
 -- markdown U
 -- name: UpdateMarkdown :exec

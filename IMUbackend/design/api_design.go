@@ -32,9 +32,11 @@ var StudentProfile = Type("StudentProfile", func() {
 	Attribute("img", File)
 })
 
-var ArticleIdName = Type("ArticleIdName", func() {
+var Article = Type("ArticleIdName", func() {
 	Attribute("id", String)
 	Attribute("name", String)
+	Attribute("studentID", String)
+	Attribute("title", String)
 	Attribute("updated", Int64)
 })
 
@@ -75,7 +77,7 @@ var _ = Service("imubackend", func() {
 	Method("listArticle", func() {
 		Description("list article")
 		Result(func() {
-			Attribute("list", ArrayOf(ArticleIdName))
+			Attribute("list", ArrayOf(Article))
 		})
 		HTTP(func() {
 			GET("/article/list")

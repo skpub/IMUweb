@@ -363,13 +363,17 @@ func (q *Queries) GetArticle(ctx context.Context, id uuid.UUID) ([]GetArticleRow
 }
 
 const listMarkdown = `-- name: ListMarkdown :many
-SELECT id, title, updated FROM markdown
+SELECT m.id, m.title, m.student_id, s.name, m.updated
+FROM markdown m
+JOIN student s ON m.student_id = s.id
 `
 
 type ListMarkdownRow struct {
-	ID      uuid.UUID `json:"id"`
-	Title   string    `json:"title"`
-	Updated time.Time `json:"updated"`
+	ID        uuid.UUID `json:"id"`
+	Title     string    `json:"title"`
+	StudentID string    `json:"student_id"`
+	Name      string    `json:"name"`
+	Updated   time.Time `json:"updated"`
 }
 
 func (q *Queries) ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error) {
@@ -381,7 +385,13 @@ func (q *Queries) ListMarkdown(ctx context.Context) ([]ListMarkdownRow, error) {
 	var items []ListMarkdownRow
 	for rows.Next() {
 		var i ListMarkdownRow
-		if err := rows.Scan(&i.ID, &i.Title, &i.Updated); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.StudentID,
+			&i.Name,
+			&i.Updated,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -4,8 +4,9 @@ import (
 	pb "IMUbackend/gen/imubackend"
 	entity "IMUbackend/internal/entity"
 	"context"
-	"time"
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -19,9 +20,11 @@ func (s *IMUSrv) ListArticle(ctx context.Context) (*pb.ListArticleResult, error)
 		idStr := id.ID.String()
 		updated := id.Updated.Unix()
 		ids.List = append(ids.List, &pb.ArticleIDName{
-			ID:      &idStr,
-			Name:    &id.Title,
-			Updated: &updated,
+			ID:        &idStr,
+			Name:      &id.Name,
+			StudentID: &id.StudentID,
+			Title:     &id.Title,
+			Updated:   &updated,
 		})
 	}
 	return &ids, nil
