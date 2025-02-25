@@ -1,4 +1,4 @@
-This is e-upTeX, Version 3.141592653-p3.9.1-u1.27-210218-2.6 (utf8.uptex) (TeX Live 2022/dev/Debian) (preloaded format=uplatex 2024.8.1)  12 FEB 2025 19:31
+This is e-upTeX, Version 3.141592653-p3.9.1-u1.27-210218-2.6 (utf8.uptex) (TeX Live 2022/dev/Debian) (preloaded format=uplatex 2024.8.1)  25 FEB 2025 14:39
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -194,6 +194,14 @@ LaTeX Font Info:    Font shape `JY2/mc/m/n' will be
 (Font)              scaled to size 6.47278pt on input line 23.
 LaTeX Font Info:    Font shape `JY2/mc/m/n' will be
 (Font)              scaled to size 4.62341pt on input line 23.
+LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 4
+2.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 42.
  [2]
 LaTeX Font Info:    Font shape `JT2/mc/m/n' will be
 (Font)              scaled to size 6.47278pt on input line 91.
@@ -205,12 +213,12 @@ LaTeX Font Info:    Font shape `JY2/gt/m/n' will be
  [4]
 (.tex_temp/shiken.aux) ) 
 Here is how much of TeX's memory you used:
- 2246 strings out of 479842
- 32611 string characters out of 5887290
+ 2266 strings out of 479842
+ 32954 string characters out of 5887290
  332035 words of memory out of 5000000
- 20596 multiletter control sequences out of 15000+600000
+ 20613 multiletter control sequences out of 15000+600000
  481968 words of font info for 94 fonts, out of 8000000 for 9000
  269 hyphenation exceptions out of 8191
  54i,6n,62p,223b,266s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on .tex_temp/shiken.dvi (4 pages, 6044 bytes).
+Output written on .tex_temp/shiken.dvi (4 pages, 6056 bytes).
