@@ -125,8 +125,9 @@
     }
   }
   input {
-    width: 100%;
+    width: calc(100%);
     padding: 10px;
+    box-sizing: border-box;
     margin-top: 10px;
     font-size: 18px;
   }

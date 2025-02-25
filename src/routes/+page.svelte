@@ -7,12 +7,16 @@
 
   type ArticleHead = {
     id: string
-    name: string
+    title: string
+    name: string,
+    studentID: string,
     updated: string
   }
   type ArticleHeadGot = {
     id: string,
+    title: string,
     name: string,
+    studentID: string,
     updated: bigint
   }
 
@@ -24,10 +28,13 @@
   function get() {
     if (data["list"]["list"] === undefined) return
     data["list"]["list"].forEach((element: ArticleHeadGot) => {
-      let dateTime = new Date(Number(element["updated"]) * 1000)
+      console.log(element)
+      let dateTime = new Date(Number(element.updated) * 1000)
       const article: ArticleHead = {
-        id: element["id"],
-        name: element["name"],
+        id: element.id,
+        title: element.title,
+        name: element.name,
+        studentID: element.studentID,
         updated: dateTime.toLocaleString()
       }
       list.unshift(article)
@@ -56,7 +63,7 @@
     const res = await fetch(PUBLIC_BACKEND_ADDR + ':' + PUBLIC_BACKEND_PORT + '/api/article/get/' + id)
     const data = await res.json()
     const article_: Article = {
-      title: data["articleName"],
+      title: data["articleTitle"],
       content: data["content"]
     }
     article = article_
@@ -88,8 +95,10 @@
   <div id="article-list">
     {#each list as item}
     <div class="articleSelection margin-left24" onclick={() => getArticle(item["id"])}>
-      <p class="articleName"><b>{item["name"]}</b></p>
-      <p class="articleTime">{item["updated"]}</p>
+      <p class="articleTitle"><b>{item.title}</b></p>
+      <div>
+        <p class="articleDesc">{item.name}@{item.studentID} {item.updated}</p>
+      </div>
     </div>
     {/each}
   </div>
@@ -120,11 +129,11 @@
       .articleSelection {
         display: flex;
         border-bottom: dotted 2px var(--white);
-        .articleName {
+        .articleTitle {
           margin-left: 12px;
           flex: 1;
         }
-        .articleTime {
+        .articleDesc {
           margin-right: 32px;
         }
       }
