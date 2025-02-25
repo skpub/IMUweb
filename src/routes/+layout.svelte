@@ -86,11 +86,11 @@
       name: '学生一覧',
       link: 'student'
     },
-    $LoggedIn === true ? {}: 
-    {
+    ...($LoggedIn === true ? [] : 
+    [{
       name: 'ログイン',
       link: 'login'
-    },
+    }]),
   ])
 </script>
 
@@ -110,7 +110,7 @@
           <a href={`/${content.link}`}>{content.name}</a>
         {/each}
       </div>
-      {#if $LoggedIn === true }
+      {#if $LoggedIn}
       <div id="student-contents">
         {#each studentContents as content} 
           <a href={`/${content.link}`}>{content.name}</a>
@@ -128,6 +128,15 @@
         {#each contents as content} 
           <a href={`/${content.link}`} onclick={() => hamburger_active = false}>{content.name}</a>
         {/each}
+        {#if $LoggedIn}
+          {#each studentContents as content} 
+            <a href={`/${content.link}`} onclick={() => hamburger_active = false}>{content.name}</a>
+          {/each}
+          <span onclick={() => {
+            logout()
+            notify('ログアウトしました', 'info')
+          }}>ログアウト</span>
+        {/if}
       </nav>
     </div>
   </div>
@@ -238,7 +247,7 @@
       height: 90px;
       flex: 1;
 
-      a {
+      a, span {
         margin: 10px;
         color: var(--white);
       }
@@ -282,7 +291,7 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     #logo {
       position: fixed;
       width: 100dvw;
@@ -300,7 +309,7 @@
     }
   }
 
-  @media (min-width: 769px) {
+  @media (min-width: 901px) {
     #contents {
       background: var(--immoral-shadow);
       #contents_list_mobile {
