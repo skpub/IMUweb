@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import imu_logo from '$lib/assets/IMU_logo.svg'
+  import imu_logo_light from '$lib/assets/IMU_logo_light.svg'
   import imu_text_logo from '$lib/assets/IMU_text_logo.svg'
   import hamburger from '$lib/assets/hamburger.svg'
   import { onMount } from 'svelte';
@@ -100,7 +101,7 @@
 
 <header>
   <div id="logo" class="clickable" onclick={() => {goto('/'); hamburger_active = false}}>
-    <img id="imu-logo" src={imu_logo} alt="IMU Logo" />
+    <img id="imu-logo" src={theme ? imu_logo_light : imu_logo} alt="IMU Logo" />
     <div id="imu-text-logo" style='mask-image: url("{imu_text_logo}");'></div>
   </div>
   <div id="contents">
